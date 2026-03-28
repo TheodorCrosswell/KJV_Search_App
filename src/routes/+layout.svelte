@@ -1,35 +1,31 @@
 <script>
-	import '../app.css'; // Imports TailwindCSS
-	import { pwaInfo } from 'virtual:pwa-info';
-	import { onMount } from 'svelte';
+  import '../app.css';
+  import { onMount } from 'svelte';
+  import { dev } from '$app/environment'; /* <--- Add this import */
+  import { initDB } from '$lib/db/db';
+  import NavBar from '$lib/components/NavBar.svelte';
+  
+  let dbReady = false;
 
-	let { children } = $props();
-
-	onMount(async () => {
-		if (pwaInfo) {
-			// Dynamically load the service worker registration only on the client
-			const { registerSW } = await import('virtual:pwa-register');
-			registerSW({
-				immediate: true,
-				onRegistered(r) {
-					console.log('Service Worker Registered');
-				},
-				onRegisterError(error) {
-					console.error('Service Worker Registration Error', error);
-				}
-			});
-		}
-	});
+  onMount(async () => {
+    // Only register the service worker if NOT in dev mode
+    if (!dev && 'serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js');
+    }
+    
+    await initDB();
+    dbReady = true;
+  });
 </script>
 
-<!-- CORRECT: <svelte:head> is at the root level of the component -->
-<svelte:head>
-	{#if pwaInfo}
-		{@html pwaInfo.webManifest.linkTag}
-	{/if}
-</svelte:head>
-
-<!-- Renders your pages -->
-<main class="min-h-screen bg-gray-50 p-8 text-gray-900">
-	{@render children()}
-</main>
+<!-- The rest of your HTML stays the same -->
+{#if dbReady}
+  <main class="min-h-screen relative p-4 pb-24">
+    <slot />
+  </main>
+  <NavBar />
+{:else}
+  <div class="flex items-center justify-center min-h-screen">
+    <p class="text-xl animate-pulse">Initializing Bible Data...</p>
+  </div>
+{/if}
