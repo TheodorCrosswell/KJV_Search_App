@@ -1,6 +1,25 @@
 <script>
-	import { BIBLE_BOOKS } from '$lib/utils/helpers';
+	import { BIBLE_BOOKS, BOOK_ABBREVIATIONS } from '$lib/utils/helpers';
+	import { db } from '$lib/db/db';
+	import { onMount } from 'svelte';
+
 	const books = Object.keys(BIBLE_BOOKS);
+	
+	let selectedBook = null;
+	let readChapters = new Set();
+	
+	onMount(async () => {
+		const progress = await db.reading_progress.toArray();
+		readChapters = new Set(progress.filter(p => p.is_completed).map(p => p.id));
+	});
+
+	$: isBookRead = (book) => {
+		const total = BIBLE_BOOKS[book];
+		for (let i = 1; i <= total; i++) {
+			if (!readChapters.has(`${book}_${i}`)) return false;
+		}
+		return true;
+	};
 </script>
 
 <div class="mb-6 flex items-center justify-between">
@@ -8,20 +27,39 @@
 	<a href="/read/tracker" class="text-blue-600 underline">View Heatmap Tracker</a>
 </div>
 
-<div class="grid gap-2">
-	{#each books as book}
-		<details class="rounded bg-white p-4 shadow">
-			<summary class="cursor-pointer text-lg font-semibold">{book}</summary>
-			<div class="mt-4 grid grid-cols-5 gap-2">
-				{#each Array(BIBLE_BOOKS[book]) as _, i}
-					<a
-						href="/read/{book}/{i + 1}"
-						class="rounded bg-gray-100 p-2 text-center hover:bg-blue-100"
-					>
-						{i + 1}
-					</a>
-				{/each}
-			</div>
-		</details>
-	{/each}
-</div>
+{#if !selectedBook}
+	<!-- Book Grid -->
+	<div class="grid grid-cols-6 gap-2">
+		{#each books as book}
+			<button 
+				class="flex aspect-square flex-col items-center justify-center rounded p-1 shadow transition-colors md:p-2 {isBookRead(book) ? 'bg-green-500 text-white' : 'bg-white text-gray-900 hover:bg-gray-100'}"
+				on:click={() => selectedBook = book}
+			>
+				<span class="text-lg font-bold leading-none md:text-xl">{BOOK_ABBREVIATIONS[book]}</span>
+				<span class="mt-1 w-full truncate text-center text-[0.55rem] leading-tight md:text-xs">{book}</span>
+			</button>
+		{/each}
+	</div>
+{:else}
+	<!-- Chapter Grid -->
+	<div class="mb-4">
+		<button class="flex items-center text-blue-600 underline" on:click={() => selectedBook = null}>
+			&larr; Back to Books
+		</button>
+	</div>
+	
+	<h2 class="mb-4 text-2xl font-bold">{selectedBook}</h2>
+	
+	<div class="grid grid-cols-6 gap-2">
+		{#each Array(BIBLE_BOOKS[selectedBook]) as _, i}
+			{@const chapNum = i + 1}
+			{@const isRead = readChapters.has(`${selectedBook}_${chapNum}`)}
+			<a 
+				href="/read/{selectedBook}/{chapNum}"
+				class="flex aspect-square items-center justify-center rounded text-lg font-bold shadow transition-colors md:text-xl {isRead ? 'bg-green-500 text-white' : 'bg-white text-gray-900 hover:bg-gray-100'}"
+			>
+				{chapNum}
+			</a>
+		{/each}
+	</div>
+{/if}

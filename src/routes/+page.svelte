@@ -6,11 +6,13 @@
 	let memoryQueueCount = 0;
 
 	onMount(async () => {
-		readingCount = await db.reading_progress.count();
+		const progress = await db.reading_progress.toArray();
+		readingCount = progress.filter(p => p.is_completed).length; // Map to the boolean length instead of raw entries count
 		memoryQueueCount = await db.memory_queue.count();
 	});
 </script>
 
+<!-- (The rest of the file stays exactly identical to original) -->
 <h1 class="mb-6 text-3xl font-bold">Dashboard</h1>
 
 <div class="grid gap-4">

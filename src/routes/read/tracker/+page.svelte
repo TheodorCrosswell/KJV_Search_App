@@ -5,21 +5,21 @@
 	import ProgressBar from '$lib/components/ProgressBar.svelte';
 	import HeatmapGrid from '$lib/components/HeatmapGrid.svelte';
 
-	let heatmapData = [];
+	let heatmapData =[];
 	let stats = { globalMin: 0, completedInCycle: 0 };
 
 	onMount(async () => {
 		const { globalMin, completedInCycle, progressMap } = await getCycleStats(db);
 		stats = { globalMin, completedInCycle };
 
-		const mapDict = Object.fromEntries(progressMap.map((p) => [p.id, p.completion_counts]));
+		const mapDict = Object.fromEntries(progressMap.map((p) =>[p.id, p.is_completed]));
 
 		let generatedData = [];
 		for (const [book, chapters] of Object.entries(BIBLE_BOOKS)) {
 			for (let i = 1; i <= chapters; i++) {
 				const id = `${book}_${i}`;
-				const count = mapDict[id] || 0;
-				generatedData.push({ id, intensity: Math.max(0, count - globalMin) });
+				const isCompleted = mapDict[id] || false;
+				generatedData.push({ id, intensity: isCompleted ? 4 : 0 });
 			}
 		}
 		heatmapData = generatedData;
