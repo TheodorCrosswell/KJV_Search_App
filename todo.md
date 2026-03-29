@@ -1,0 +1,14 @@
+- Ensure that kjv-data.json is only downloaded on first visit or if it is missing.
+- Add a settings page to adjust text size, colors, light/dark theme, zoom level.
+- Add ability to select one or multiple verses in a chpater (more: select verses across different chapters and add them to collection, then have ability to select one or more verses from the collection and copy them at the same time.)
+- Fix previous/next page buttons being at the bottom of the page. They need to be frozen and visible to the user at all times while on the reading page, so they can navigate between chapters without having to scroll down.
+- Add ability to return to homepage of the app
+- Add labels for books and chapters in the heatmap
+- Add ability to update your progress in bulk, by saying how many times you have read the bible total and selecting which books you have already completed in this reading cycle. Same for Bible Memory.
+- Change the chapter selection page: make it a grid of all the books (e.g. 11 V x 6 H = 66 total), color the books based on their completion % this cycle, and also color the chapters when you select a book. Have chapters be a grid of the same size as the books, but just be consecutive numbers relating to the chapters instead of books.
+- Fix memory game: it currently has all the words hidden when you play level 1, and they become visible after you press the first key. Make it so that on level 1 the words are visible from the beginning, even before you press any key.
+- Add actions button to the reading page. e.g. button for add/remove from reading completion, add/remove from memory queue, copy text of selected verses, copy whole chapter.
+- restructure data: reading completion should only be bool, reflecting completion for this reading cycle. Then total count should be a single number. SO the reading data should not have times_read for each individual chapter, but rather a single number stored somewhere.
+- Add Bible memory review reminder/alert. users should review a chapter after memorizing it: once every day for a week, Once a week for a month, and once a month for a year, and then once a year. Users should also be able to pause or skip a memory reminder.
+- change mechanism for adding Bible Memory chapters: instead of typing the chapter name in a text box, add a chapter selection screen (should be the same as the reading chapter selection screen.)
+- make the UI more ergonomic and pretty.
