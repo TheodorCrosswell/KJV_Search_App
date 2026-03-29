@@ -1,6 +1,6 @@
 {
-  "name": "Offline Bible PWA",
-  "short_name": "Bible",
+  "name": "KJV Bible",
+  "short_name": "KJV",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
