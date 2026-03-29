@@ -3,7 +3,7 @@ export const BIBLE_BOOKS = {
   // Old Testament
   Genesis: 50,
   Exodus: 40,
-  Leviticicus: 27,
+  Leviticus: 27,
   Numbers: 36,
   Deuteronomy: 34,
   Joshua: 24,
