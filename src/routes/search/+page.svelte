@@ -140,13 +140,13 @@
 	}
 </script>
 
-<h1 class="mb-4 text-2xl font-bold">Regex Bible Search</h1>
+<h1 class="mb-4 text-2xl font-bold">Bible Search</h1>
 
 <div class="mb-6 flex gap-2">
 	<input
 		type="text"
 		bind:value={query}
-		placeholder="e.g. \bGod\b.*\bworld\b"
+		placeholder="Search here."
 		class="flex-1 rounded border p-3 shadow-sm ring-blue-500 outline-none focus:ring-2"
 		on:keydown={(e) => e.key === 'Enter' && handleSearch()}
 	/>
