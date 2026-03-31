@@ -1,47 +1,17 @@
 import Dexie from 'dexie';
 
-// 1. Define the current version of your DATA (independent of Dexie schema version)
-const KJV_DATA_VERSION = 2; // Increment this whenever you update kjv-data.json
+const KJV_TOTAL_VERSES = 31102;
 
 class BibleDatabase extends Dexie {
     constructor() {
         super('KJVBible');
         
-        this.version(3).stores({
-            kjv_text: 'id, citation, book,[book+chapter]',
-            reading_progress: 'id, completion_date, completion_counts',
-            memory_queue: 'citation',
-            memory_progress: 'id, citation, current_level, last_practiced_at, [citation+current_level]',
-            metadata: 'key' 
-        });
-
-        // Add version 4 for the new schema
-        this.version(4).stores({
+        this.version(1).stores({
             kjv_text: 'id, citation, book, [book+chapter]',
             reading_progress: 'id, completion_date, is_completed',
             memory_queue: 'citation',
             memory_progress: 'id, citation, current_level, last_practiced_at, [citation+current_level]',
             metadata: 'key' 
-        }).upgrade(async tx => {
-            // Migrate old progress items:
-            const allProgress = await tx.reading_progress.toArray();
-            let globalMin = 0;
-            if (allProgress.length === 1189) {
-                const counts = allProgress.map(p => p.completion_counts || 0);
-                globalMin = Math.min(...counts);
-            }
-            if (globalMin > 0) {
-                await tx.metadata.put({ key: 'completion_counts', value: globalMin });
-            }
-            // Replace completion_counts with is_completed mapping
-            return tx.reading_progress.toCollection().modify(progress => {
-                if ((progress.completion_counts || 0) > globalMin) {
-                    progress.is_completed = true;
-                } else {
-                    progress.is_completed = false;
-                }
-                delete progress.completion_counts;
-            });
         });
 
         this.kjv_text = this.table('kjv_text');
@@ -56,24 +26,34 @@ export const db = new BibleDatabase();
 
 export async function initDB() {
     try {
-        const storedVersionRecord = await db.metadata.get('kjv_data_version');
-        const currentInstalledVersion = storedVersionRecord ? storedVersionRecord.value : 0;
+        const count = await db.kjv_text.count();
 
-        if (currentInstalledVersion < KJV_DATA_VERSION) {
-            console.log(`Updating data: ${currentInstalledVersion} -> ${KJV_DATA_VERSION}`);
+        // Check if data is missing OR incomplete
+        if (count !== KJV_TOTAL_VERSES) {
+            console.log(`Database count (${count}) is incorrect. Expected ${KJV_TOTAL_VERSES}. Reloading...`);
             
-            const res = await fetch(`/kjv-data.json?v=${KJV_DATA_VERSION}`);
+            // 1. Fetch the data first 
+            // (If the network fails here, the existing data stays untouched)
+            const res = await fetch('/kjv-data.json');
             if (!res.ok) throw new Error('Failed to fetch kjv-data.json');
             const data = await res.json();
 
-            await db.transaction('rw', [db.kjv_text, db.metadata], async () => {
+            // 2. Validate the fetched data before touching the DB
+            if (!Array.isArray(data) || data.length !== KJV_TOTAL_VERSES) {
+                throw new Error(`Fetched JSON size mismatch. Got ${data.length} items.`);
+            }
+
+            // 3. Use a transaction to clear and refill
+            // This ensures "All or Nothing" - if the tab closes during bulkAdd,
+            // the table will revert to its previous state.
+            await db.transaction('rw', db.kjv_text, async () => {
                 await db.kjv_text.clear();
                 await db.kjv_text.bulkAdd(data);
-                await db.metadata.put({ key: 'kjv_data_version', value: KJV_DATA_VERSION });
             });
-            console.log("Database updated successfully");
+
+            console.log("Database populated successfully with 31,102 verses.");
         }
     } catch (error) {
-        console.error("Database initialization/update failed:", error);
+        console.error("Database initialization failed:", error);
     }
 }
