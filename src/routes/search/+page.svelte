@@ -11,6 +11,12 @@
 	/** @type {Set<any>} */
 	let favoriteIds = new Set(); // To color favorite hearts
 
+	// --- Search History & Highlighting State ---
+	/** @type {Array<string>} */
+	let recentSearches = [];
+	/** @type {Array<string>} */
+	let currentSearchWords = [];
+
 	// --- Selection State ---
 	let selectionMode = false;
 	/** @type {Set<any>} */
@@ -22,20 +28,69 @@
 	onMount(async () => {
 		const favs = await db.favorite_verses.toArray();
 		favoriteIds = new Set(favs.map(f => f.id));
+
+		// Load search history
+		try {
+			const savedHistory = localStorage.getItem('recentSearches');
+			if (savedHistory) {
+				recentSearches = JSON.parse(savedHistory);
+			}
+		} catch (e) {
+			console.error("Failed to load search history", e);
+		}
 	});
 
+	/** @param {string} string */
+	function escapeRegExp(string) {
+		return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+	}
+
 	async function handleSearch() {
-		if (!query) return;
+		const searchWords = query.trim().split(/\s+/).filter(w => w.length > 0);
+		if (searchWords.length === 0) return;
+
 		isSearching = true;
 		clearSelection(); // Reset selection on new search
+
+		// Update History Queue (FIFO - Max 10)
+		const queryStr = query.trim();
+		let newHistory = recentSearches.filter(q => q.toLowerCase() !== queryStr.toLowerCase());
+		newHistory.unshift(queryStr);
+		if (newHistory.length > 10) {
+			newHistory.pop();
+		}
+		recentSearches = newHistory;
+		try {
+			localStorage.setItem('recentSearches', JSON.stringify(recentSearches));
+		} catch (e) {}
+
+		currentSearchWords = searchWords;
 		
 		try {
-			const regex = new RegExp(query, 'i');
-			results = await db.kjv_text.filter((v) => regex.test(v.text)).toArray();
+			// Generate word boundary regexes to ensure words start with the search prefixes
+			const wordRegexes = searchWords.map(sw => new RegExp(`\\b${escapeRegExp(sw)}`, 'i'));
+			
+			results = await db.kjv_text.filter((v) => {
+				// The verse must pass the check for EVERY word regex constraint
+				return wordRegexes.every(regex => regex.test(v.text));
+			}).toArray();
 		} catch (e) {
-			alert('Invalid Regex');
+			alert('Search process error');
 		}
 		isSearching = false;
+	}
+
+	/** @param {string} text */
+	function highlight(text) {
+		if (!currentSearchWords || currentSearchWords.length === 0) return text;
+		
+		// Sort words by length descending to match longest possible prefixes first
+		const pattern = currentSearchWords.map(escapeRegExp).sort((a,b) => b.length - a.length).join('|');
+		
+		// Match the beginning of a word (\b), one of our prefixes, and the rest of the word letters/apostrophes/hyphens
+		const regex = new RegExp(`\\b(${pattern})[a-zA-Z0-9'\\-]*`, 'gi');
+		
+		return text.replace(regex, '<mark class="bg-yellow-200 text-gray-900 rounded-sm px-1">$&</mark>');
 	}
 
 	/** @param {any} verse */
@@ -155,6 +210,22 @@
 	</button>
 </div>
 
+{#if recentSearches.length > 0}
+	<div class="mb-6">
+		<h2 class="mb-2 text-sm font-semibold uppercase tracking-wider text-gray-500">Recent Searches</h2>
+		<div class="flex flex-wrap gap-2">
+			{#each recentSearches as rq}
+				<button
+					class="rounded-full bg-gray-100 px-4 py-1.5 text-sm text-gray-700 transition hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+					on:click={() => query = rq}
+				>
+					{rq}
+				</button>
+			{/each}
+		</div>
+	</div>
+{/if}
+
 {#if isSearching}
 	<p>Searching...</p>
 {:else}
@@ -164,7 +235,7 @@
 			<!-- svelte-ignore a11y-interactive-supports-focus -->
 			<div
 				role="button"
-				class="flex cursor-pointer select-none items-start gap-4 rounded p-4 shadow transition-colors group {selectedVerses.has(res.id) ? 'bg-blue-100' : 'bg-white hover:bg-gray-50'}"
+				class="group flex cursor-pointer select-none items-start gap-4 rounded p-4 shadow transition-colors {selectedVerses.has(res.id) ? 'bg-blue-100' : 'bg-white hover:bg-gray-50'}"
 				on:touchstart={() => startPress(res)}
 				on:touchend={cancelPress}
 				on:touchmove={cancelPress}
@@ -177,7 +248,7 @@
 			>
 				<div class="flex-1 text-left">
 					<h3 class="mb-1 font-bold {selectedVerses.has(res.id) ? 'text-blue-800' : 'text-blue-600'}">{res.citation}</h3>
-					<p class="text-gray-800">{res.text}</p>
+					<p class="text-gray-800">{@html highlight(res.text)}</p>
 				</div>
 				<!-- Favorite Toggle Button -->
 				<button 
@@ -196,7 +267,7 @@
 {#if selectionMode}
 	<div class="fixed bottom-6 left-0 right-0 z-50 mx-auto flex w-[95%] max-w-lg items-center justify-between rounded-full bg-gray-900 px-6 py-4 text-white shadow-2xl transition-transform">
 		<span class="font-semibold">{selectedVerses.size} selected</span>
-		<div class="flex items-center gap-3 sm:gap-4 text-sm font-medium">
+		<div class="flex items-center gap-3 text-sm font-medium sm:gap-4">
 			<button on:click={copySelected} class="transition-colors hover:text-blue-300">Copy</button>
 			<button on:click={favoriteSelected} class="transition-colors hover:text-red-300">Favorite</button>
 			<button on:click={locateSelected} class="transition-colors hover:text-green-300">Locate</button>
