@@ -6,8 +6,11 @@
 	$: book = $page.params.book;
 	$: chapter = parseInt($page.params.chapter);
 
+	/** @type {Array<any>} */
 	let verses = [];
 	let isCompleted = false;
+	
+	/** @type {Set<any>} */
 	let favoriteIds = new Set(); // To color favorite hearts
 
 	$: maxChapter = BIBLE_BOOKS[book] || 1;
@@ -39,7 +42,7 @@
 			isCompleted = true;
 			
 			const allProgress = await db.reading_progress.toArray();
-			const completedCount = allProgress.filter(p => p.is_completed).length;
+			const completedCount = allProgress.filter(/** @type {any} */ p => p.is_completed).length;
 			
 			if (completedCount >= TOTAL_CHAPTERS) {
 				const confirmReset = confirm("Congratulations! You have read the entire Bible! Do you want to increment your completion count and reset your progress?");
@@ -48,7 +51,7 @@
 					const counts = countsRecord ? countsRecord.value : 0;
 					await db.metadata.put({ key: 'completion_counts', value: counts + 1 });
 					
-					const updatedProgress = allProgress.map(p => ({ ...p, is_completed: false }));
+					const updatedProgress = allProgress.map(/** @type {any} */ p => ({ ...p, is_completed: false }));
 					await db.reading_progress.bulkPut(updatedProgress);
 					isCompleted = false;
 				}
@@ -59,6 +62,7 @@
 		}
 	}
 
+	/** @param {any} verse */
 	async function toggleFavorite(verse) {
 		if (favoriteIds.has(verse.id)) {
 			await db.favorite_verses.delete(verse.id);
@@ -75,6 +79,7 @@
 	}
 </script>
 
+<!-- Rest of the component HTML omitted for brevity (remains identical) -->
 <div class="mb-6 flex items-center justify-between">
 	<h1 class="text-2xl font-bold">{book} {chapter}</h1>
 	<button

@@ -2,6 +2,7 @@
 	import { db } from '$lib/db/db';
 	import { onMount } from 'svelte';
 
+	/** @type {Array<any>} */
 	let favoritesWithText = [];
 
 	onMount(async () => {
@@ -15,12 +16,14 @@
 		}));
 	});
 
+	/** @param {number|string} id */
 	async function removeFavorite(id) {
 		await db.favorite_verses.delete(id);
 		favoritesWithText = favoritesWithText.filter(f => f.id !== id);
 	}
 </script>
 
+<!-- The rest of your HTML template remains the same -->
 <div class="mb-6 flex items-center justify-between">
 	<h1 class="text-2xl font-bold">Favorite Verses</h1>
 </div>

@@ -5,16 +5,21 @@
 
 	const books = Object.keys(BIBLE_BOOKS);
 	
+	/** @type {string | null} */
 	let selectedBook = null;
+	
+	/** @type {Set<string>} */
 	let readChapters = new Set();
 	
 	onMount(async () => {
 		const progress = await db.reading_progress.toArray();
-		readChapters = new Set(progress.filter(p => p.is_completed).map(p => p.id));
+        // ADD TYPES TO p
+		readChapters = new Set(progress.filter((/** @type {any} */ p) => p.is_completed).map((/** @type {any} */ p) => p.id));
 	});
 
 	// Logic to calculate percentage (0 to 100)
-	$: getBookProgress = (book) => {
+    // ADD TYPE DIRECTLY TO REACTIVE CLOSURE PARAMETER
+	$: getBookProgress = (/** @type {string} */ book) => {
 		const total = BIBLE_BOOKS[book];
 		let completedCount = 0;
 		for (let i = 1; i <= total; i++) {
@@ -26,6 +31,7 @@
 	};
 </script>
 
+<!-- The rest of your HTML template remains the same -->
 <div class="mb-6 flex items-center justify-between">
 	<h1 class="text-2xl font-bold">Read the Bible</h1>
 </div>

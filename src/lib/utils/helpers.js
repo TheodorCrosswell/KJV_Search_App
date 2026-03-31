@@ -1,3 +1,4 @@
+/** @type {Record<string, number>} */
 export const BIBLE_BOOKS = {
   // Old Testament
   Genesis: 50, Exodus: 40, Leviticus: 27, Numbers: 36, Deuteronomy: 34,
@@ -18,6 +19,7 @@ export const BIBLE_BOOKS = {
   "3 John": 1, Jude: 1, Revelation: 22
 };
 
+/** @type {Record<string, string>} */
 export const BOOK_ABBREVIATIONS = {
   Genesis: 'Ge', Exodus: 'Ex', Leviticus: 'Le', Numbers: 'Nu', Deuteronomy: 'De',
   Joshua: 'Jo', Judges: 'Ju', Ruth: 'Ru', '1 Samuel': '1S', '2 Samuel': '2S',
@@ -37,10 +39,18 @@ export const BOOK_ABBREVIATIONS = {
 
 export const TOTAL_CHAPTERS = 1189;
 
+/**
+ * @param {string} word
+ * @returns {string}
+ */
 export function stripPunctuation(word) {
 	return word.replace(/[^\w\s]|_/g, '').replace(/\s+/g, ' ');
 }
 
+/**
+ * @param {string} text
+ * @returns {string[]}
+ */
 export function getFirstLetters(text) {
 	return text
 		.split(' ')
@@ -51,6 +61,10 @@ export function getFirstLetters(text) {
 		.filter((l) => l !== '');
 }
 
+/**
+ * @param {import('../db/db').BibleDatabase} db
+ * @returns {Promise<{globalMin: number, completedInCycle: number, progressMap: any[]}>}
+ */
 export async function getCycleStats(db) {
 	const progress = await db.reading_progress.toArray();
     
@@ -58,7 +72,7 @@ export async function getCycleStats(db) {
     const countRecord = await db.metadata.get('completion_counts');
     const globalMin = countRecord ? countRecord.value : 0;
 
-	const completedInCycle = progress.filter((p) => p.is_completed).length;
+	const completedInCycle = progress.filter((/** @type {any} */ p) => p.is_completed).length;
 
 	return { globalMin, completedInCycle, progressMap: progress };
 }

@@ -2,7 +2,7 @@ import Dexie from 'dexie';
 
 const KJV_TOTAL_VERSES = 31102;
 
-class BibleDatabase extends Dexie {
+export class BibleDatabase extends Dexie {
     constructor() {
         super('KJVBible');
         
@@ -18,19 +18,38 @@ class BibleDatabase extends Dexie {
             favorite_verses: 'id, citation, timestamp'
         });
 
+        /** @type {import('dexie').Table} */
         this.kjv_text = this.table('kjv_text');
+        
+        /** @type {import('dexie').Table} */
         this.reading_progress = this.table('reading_progress');
+        
+        /** @type {import('dexie').Table} */
         this.memory_queue = this.table('memory_queue');
+        
+        /** @type {import('dexie').Table} */
         this.memory_progress = this.table('memory_progress');
+        
+        /** @type {import('dexie').Table} */
         this.metadata = this.table('metadata');
+        
+        /** @type {import('dexie').Table} */
         this.latest_reading = this.table('latest_reading');
+        
+        /** @type {import('dexie').Table} */
         this.settings = this.table('settings');
+        
+        /** @type {import('dexie').Table} */
         this.favorite_verses = this.table('favorite_verses');
     }
 }
 
 export const db = new BibleDatabase();
 
+/**
+ * Initializes the database and fetches the Bible json data if missing
+ * @returns {Promise<void>}
+ */
 export async function initDB() {
     try {
         const count = await db.kjv_text.count();
