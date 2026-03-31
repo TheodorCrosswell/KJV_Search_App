@@ -27,7 +27,6 @@
 
 <div class="mb-6 flex items-center justify-between">
 	<h1 class="text-2xl font-bold">Memory Queue</h1>
-	<a href="/memory/tracker" class="text-blue-600 underline">View Heatmap</a>
 </div>
 
 <div class="mb-6 flex gap-2">
