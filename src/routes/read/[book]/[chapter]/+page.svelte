@@ -102,24 +102,34 @@
 		</div>
 	{/each}
 </div>
-
 <!-- Extra height pushing the final verses safely above the floating absolute controls -->
 <div class="h-24"></div>
 
-<div class="fixed bottom-6 left-0 right-0 z-40 mx-auto flex w-full max-w-4xl justify-between px-4 pointer-events-none">
-	{#if chapter > 1}
-		<a href="/read/{book}/{chapter - 1}" class="pointer-events-auto rounded-full bg-blue-600 px-6 py-3 font-semibold text-white shadow-lg transition-transform active:scale-95">
-			&larr; Prev
-		</a>
-	{:else}
-		<div></div>
-	{/if}
+<div class="pointer-events-none fixed bottom-6 left-0 right-0 z-40 mx-auto flex w-full max-w-4xl justify-between gap-2 px-4">
+	<!-- Left Side: Prev -->
+	<div class="flex flex-1 justify-start">
+		{#if chapter > 1}
+			<a href="/read/{book}/{chapter - 1}" class="pointer-events-auto rounded-full bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-lg transition-transform active:scale-95 md:px-6 md:text-base">
+				&larr; Prev
+			</a>
+		{/if}
+	</div>
 
-	{#if chapter < maxChapter}
-		<a href="/read/{book}/{chapter + 1}" class="pointer-events-auto rounded-full bg-blue-600 px-6 py-3 font-semibold text-white shadow-lg transition-transform active:scale-95">
-			Next &rarr;
+	<!-- Center: Locate -->
+	<div class="flex flex-1 justify-center">
+		<a href="/read" class="pointer-events-auto flex items-center justify-center rounded-full bg-gray-800 px-5 py-3 text-sm font-semibold text-white shadow-lg transition-transform active:scale-95 md:px-6 md:text-base">
+			Locate
 		</a>
-	{:else}
-		<span class="pointer-events-auto rounded-full bg-gray-500 px-6 py-3 font-semibold text-white shadow-lg opacity-80">End of Book</span>
-	{/if}
+	</div>
+
+	<!-- Right Side: Next -->
+	<div class="flex flex-1 justify-end">
+		{#if chapter < maxChapter}
+			<a href="/read/{book}/{chapter + 1}" class="pointer-events-auto rounded-full bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-lg transition-transform active:scale-95 md:px-6 md:text-base">
+				Next &rarr;
+			</a>
+		{:else}
+			<span class="pointer-events-auto rounded-full bg-gray-500 px-4 py-3 text-sm font-semibold text-white opacity-80 shadow-lg md:px-6 md:text-base">End</span>
+		{/if}
+	</div>
 </div>

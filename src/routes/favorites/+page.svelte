@@ -23,7 +23,6 @@
 
 <div class="mb-6 flex items-center justify-between">
 	<h1 class="text-2xl font-bold">Favorite Verses</h1>
-	<a href="/" class="text-blue-600 underline">&larr; Home</a>
 </div>
 
 {#if favoritesWithText.length === 0}
