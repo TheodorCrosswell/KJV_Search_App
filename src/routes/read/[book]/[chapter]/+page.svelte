@@ -9,20 +9,36 @@
 	/** @type {Array<any>} */
 	let verses = [];
 	let isCompleted = false;
+	let isInMemoryQueue = false;
 	
 	/** @type {Set<any>} */
 	let favoriteIds = new Set(); // To color favorite hearts
+
+	// --- Selection State ---
+	let selectionMode = false;
+	/** @type {Set<any>} */
+	let selectedVerses = new Set();
+	/** @type {any} */
+	let pressTimer;
+	let justLongPressed = false;
 
 	$: maxChapter = BIBLE_BOOKS[book] || 1;
 
 	async function loadChapter() {
 		verses = []; // Briefly clear verses to give visual refresh mapping
+		clearSelection(); // Reset selection state between chapters
 		verses = await db.kjv_text.where({ book, chapter }).toArray();
 		verses.sort((a, b) => a.verse - b.verse);
 
 		const progressId = `${book}_${chapter}`;
+		
+		// Load Reading Progress
 		const progress = await db.reading_progress.get(progressId);
 		isCompleted = progress?.is_completed || false;
+
+		// Load Memory Queue State
+		const memoryItem = await db.memory_queue.get(progressId);
+		isInMemoryQueue = !!memoryItem;
 
 		// Save to latest reading!
 		await db.latest_reading.put({ id: 1, book, chapter });
@@ -62,6 +78,17 @@
 		}
 	}
 
+	async function toggleMemoryQueue() {
+		const progressId = `${book}_${chapter}`;
+		if (!isInMemoryQueue) {
+			await db.memory_queue.put({ citation: progressId });
+			isInMemoryQueue = true;
+		} else {
+			await db.memory_queue.delete(progressId);
+			isInMemoryQueue = false;
+		}
+	}
+
 	/** @param {any} verse */
 	async function toggleFavorite(verse) {
 		if (favoriteIds.has(verse.id)) {
@@ -77,38 +104,150 @@
 		}
 		favoriteIds = favoriteIds; // Force reactivity update
 	}
+
+	// --- Selection & Action Bar Methods ---
+	/** @param {any} verse */
+	function startPress(verse) {
+		if (selectionMode) return;
+		pressTimer = setTimeout(() => {
+			selectionMode = true;
+			justLongPressed = true;
+			toggleVerseSelection(verse);
+			if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(50);
+			setTimeout(() => justLongPressed = false, 1000); // Reset safety mechanism
+		}, 500); // 500ms long press threshold
+	}
+
+	function cancelPress() {
+		clearTimeout(pressTimer);
+	}
+
+	/** @param {any} verse */
+	function handleClick(verse) {
+		if (justLongPressed) {
+			justLongPressed = false;
+			return; // Ignore the initial click generated after letting go of a long press
+		}
+		if (selectionMode) {
+			toggleVerseSelection(verse);
+		}
+	}
+
+	/** @param {any} verse */
+	function toggleVerseSelection(verse) {
+		if (selectedVerses.has(verse.id)) {
+			selectedVerses.delete(verse.id);
+			if (selectedVerses.size === 0) {
+				selectionMode = false;
+			}
+		} else {
+			selectedVerses.add(verse.id);
+		}
+		selectedVerses = selectedVerses; // trigger reactivity update
+	}
+
+	function clearSelection() {
+		selectionMode = false;
+		selectedVerses.clear();
+		selectedVerses = selectedVerses;
+	}
+
+	async function copySelected() {
+		const sortedVerses = verses.filter(v => selectedVerses.has(v.id));
+		const textToCopy = sortedVerses.map(v => `${v.citation} ${v.text}`).join('\n');
+		
+		try {
+			await navigator.clipboard.writeText(textToCopy);
+			// Optional user feedback logic could go here
+		} catch (err) {
+			console.error('Failed to copy text: ', err);
+		}
+		clearSelection();
+	}
+
+	async function favoriteSelected() {
+		const sortedVerses = verses.filter(v => selectedVerses.has(v.id));
+		for (let v of sortedVerses) {
+			if (!favoriteIds.has(v.id)) {
+				await db.favorite_verses.put({
+					id: v.id,
+					citation: v.citation,
+					timestamp: Date.now()
+				});
+				favoriteIds.add(v.id);
+			}
+		}
+		favoriteIds = favoriteIds; // Force reactivity
+		clearSelection();
+	}
 </script>
 
-<!-- Rest of the component HTML omitted for brevity (remains identical) -->
-<div class="mb-6 flex items-center justify-between">
+<div class="mb-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
 	<h1 class="text-2xl font-bold">{book} {chapter}</h1>
-	<button
-		on:click={toggleComplete}
-		class="rounded px-4 py-2 transition-colors {isCompleted ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-900'}"
-	>
-		{isCompleted ? 'Completed' : 'Mark Complete'}
-	</button>
+	<div class="flex flex-wrap gap-2">
+		<button
+			on:click={toggleMemoryQueue}
+			class="rounded px-4 py-2 transition-colors {isInMemoryQueue ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-900 hover:bg-gray-300'}"
+		>
+			{isInMemoryQueue ? 'In Memory Queue' : 'Add to Queue'}
+		</button>
+		<button
+			on:click={toggleComplete}
+			class="rounded px-4 py-2 transition-colors {isCompleted ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-900 hover:bg-gray-300'}"
+		>
+			{isCompleted ? 'Completed' : 'Mark Complete'}
+		</button>
+	</div>
 </div>
 
-<div class="space-y-3 rounded bg-white p-6 shadow">
+<div class="space-y-1 rounded bg-white p-4 shadow sm:p-6">
 	{#if verses.length === 0}
 		<p>Loading verses...</p>
 	{/if}
 	{#each verses as v}
-		<div class="flex items-start gap-3 group">
-			<p class="text-lg flex-1"><sup class="mr-1 text-xs font-bold">{v.verse}</sup>{v.text}</p>
+		<!-- svelte-ignore a11y-interactive-supports-focus -->
+		<div
+			role="button"
+			class="flex cursor-pointer select-none items-start gap-3 rounded p-2 -mx-2 transition-colors group {selectedVerses.has(v.id) ? 'bg-blue-100' : 'hover:bg-gray-50'}"
+			on:touchstart={() => startPress(v)}
+			on:touchend={cancelPress}
+			on:touchmove={cancelPress}
+			on:mousedown={() => startPress(v)}
+			on:mouseup={cancelPress}
+			on:mouseleave={cancelPress}
+			on:click={() => handleClick(v)}
+			on:keydown={(e) => e.key === 'Enter' && handleClick(v)}
+			on:contextmenu|preventDefault
+		>
+			<p class="flex-1 text-lg"><sup class="mr-1 text-xs font-bold">{v.verse}</sup>{v.text}</p>
+			
 			<!-- Favorite Toggle Button -->
 			<button 
-				on:click={() => toggleFavorite(v)}
+				on:click|stopPropagation={() => toggleFavorite(v)}
 				class="mt-1 text-2xl transition-colors {favoriteIds.has(v.id) ? 'text-red-500' : 'text-gray-200 hover:text-red-300'}"
+				aria-label="Toggle Favorite"
 			>
 				♥
 			</button>
 		</div>
 	{/each}
 </div>
+
 <!-- Extra height pushing the final verses safely above the floating absolute controls -->
-<div class="h-24"></div>
+<div class="h-32"></div>
+
+<!-- Verses Selected Action Bar -->
+{#if selectionMode}
+	<div class="fixed bottom-24 left-0 right-0 z-50 mx-auto flex w-[90%] max-w-md items-center justify-between rounded-full bg-gray-900 px-6 py-4 text-white shadow-2xl transition-transform">
+		<span class="font-semibold">{selectedVerses.size} selected</span>
+		<div class="flex items-center gap-4 text-sm font-medium">
+			<button on:click={copySelected} class="transition-colors hover:text-blue-300">Copy</button>
+			<button on:click={favoriteSelected} class="transition-colors hover:text-red-300">Favorite</button>
+			<div class="h-4 w-px bg-gray-600"></div>
+			<button on:click={clearSelection} class="text-gray-400 transition-colors hover:text-white" aria-label="Cancel Selection">✕</button>
+		</div>
+	</div>
+{/if}
 
 <div class="pointer-events-none fixed bottom-6 left-0 right-0 z-40 mx-auto flex w-full max-w-4xl justify-between gap-2 px-4">
 	<!-- Left Side: Prev -->
