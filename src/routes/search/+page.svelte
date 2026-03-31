@@ -17,6 +17,26 @@
 	/** @type {Array<string>} */
 	let currentSearchWords = [];
 
+	// --- Filter State ---
+	let selectedCategory = 'All';
+
+	/** @type {Record<string, string[]>} */
+	const BOOK_CATEGORIES = {
+		"Old Testament": ["Genesis", "Exodus", "Leviticus", "Numbers", "Deuteronomy", "Joshua", "Judges", "Ruth", "1 Samuel", "2 Samuel", "1 Kings", "2 Kings", "1 Chronicles", "2 Chronicles", "Ezra", "Nehemiah", "Esther", "Job", "Psalms", "Proverbs", "Ecclesiastes", "Song of Solomon", "Isaiah", "Jeremiah", "Lamentations", "Ezekiel", "Daniel", "Hosea", "Joel", "Amos", "Obadiah", "Jonah", "Micah", "Nahum", "Habakkuk", "Zephaniah", "Haggai", "Zechariah", "Malachi"],
+		"New Testament": ["Matthew", "Mark", "Luke", "John", "Acts", "Romans", "1 Corinthians", "2 Corinthians", "Galatians", "Ephesians", "Philippians", "Colossians", "1 Thessalonians", "2 Thessalonians", "1 Timothy", "2 Timothy", "Titus", "Philemon", "Hebrews", "James", "1 Peter", "2 Peter", "1 John", "2 John", "3 John", "Jude", "Revelation"],
+		"Pentateuch / Law": ["Genesis", "Exodus", "Leviticus", "Numbers", "Deuteronomy"],
+		"Historical Books (OT)": ["Joshua", "Judges", "Ruth", "1 Samuel", "2 Samuel", "1 Kings", "2 Kings", "1 Chronicles", "2 Chronicles", "Ezra", "Nehemiah", "Esther"],
+		"Wisdom & Poetry": ["Job", "Psalms", "Proverbs", "Ecclesiastes", "Song of Solomon"],
+		"Major Prophets": ["Isaiah", "Jeremiah", "Lamentations", "Ezekiel", "Daniel"],
+		"Minor Prophets": ["Hosea", "Joel", "Amos", "Obadiah", "Jonah", "Micah", "Nahum", "Habakkuk", "Zephaniah", "Haggai", "Zechariah", "Malachi"],
+		"Gospels": ["Matthew", "Mark", "Luke", "John"],
+		"History (NT)": ["Acts"],
+		"Pauline Epistles": ["Romans", "1 Corinthians", "2 Corinthians", "Galatians", "Ephesians", "Philippians", "Colossians", "1 Thessalonians", "2 Thessalonians", "1 Timothy", "2 Timothy", "Titus", "Philemon"],
+		"Pastoral Epistles": ["1 Timothy", "2 Timothy", "Titus"],
+		"General Epistles": ["Hebrews", "James", "1 Peter", "2 Peter", "1 John", "2 John", "3 John", "Jude"],
+		"Apocalyptic / Prophecy": ["Revelation"]
+	};
+
 	// --- Selection State ---
 	let selectionMode = false;
 	/** @type {Set<any>} */
@@ -67,11 +87,14 @@
 		currentSearchWords = searchWords;
 		
 		try {
-			// Generate word boundary regexes to ensure words start with the search prefixes
+			const allowedBooks = selectedCategory === 'All' ? null : BOOK_CATEGORIES[selectedCategory];
 			const wordRegexes = searchWords.map(sw => new RegExp(`\\b${escapeRegExp(sw)}`, 'i'));
 			
 			results = await db.kjv_text.filter((v) => {
-				// The verse must pass the check for EVERY word regex constraint
+				// Verify book matches selected filter criteria
+				if (allowedBooks && !allowedBooks.includes(v.book)) return false;
+
+				// Verify the verse text matches EVERY word regex constraint
 				return wordRegexes.every(regex => regex.test(v.text));
 			}).toArray();
 		} catch (e) {
@@ -197,7 +220,7 @@
 
 <h1 class="mb-4 text-2xl font-bold">Bible Search</h1>
 
-<div class="mb-6 flex gap-2">
+<div class="mb-6 flex flex-col gap-3 sm:flex-row">
 	<input
 		type="text"
 		bind:value={query}
@@ -205,9 +228,20 @@
 		class="flex-1 rounded border p-3 shadow-sm ring-blue-500 outline-none focus:ring-2"
 		on:keydown={(e) => e.key === 'Enter' && handleSearch()}
 	/>
-	<button on:click={handleSearch} class="rounded bg-blue-600 px-6 py-3 font-semibold text-white">
-		Search
-	</button>
+	<div class="flex w-full gap-2 sm:w-auto">
+		<select
+			bind:value={selectedCategory}
+			class="flex-1 rounded border bg-white p-3 text-gray-700 shadow-sm ring-blue-500 outline-none focus:ring-2 sm:w-48"
+		>
+			<option value="All">All Books</option>
+			{#each Object.keys(BOOK_CATEGORIES) as category}
+				<option value={category}>{category}</option>
+			{/each}
+		</select>
+		<button on:click={handleSearch} class="rounded bg-blue-600 px-6 py-3 font-semibold text-white">
+			Search
+		</button>
+	</div>
 </div>
 
 {#if recentSearches.length > 0}
