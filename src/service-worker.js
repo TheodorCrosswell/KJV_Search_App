@@ -18,7 +18,9 @@ const CACHE_NAME = `bible-pwa-${version}`;
 
 sw.addEventListener('install', (event) => {
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+        caches.open(CACHE_NAME)
+            .then((cache) => cache.addAll(ASSETS))
+            .then(() => sw.skipWaiting()) // <-- Forces waiting worker to activate immediately
     );
 });
 
@@ -28,6 +30,8 @@ sw.addEventListener('activate', (event) => {
             return Promise.all(
                 keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
             );
+        }).then(() => {
+            sw.clients.claim(); // <-- Takes control of all open pages immediately
         })
     );
 });
