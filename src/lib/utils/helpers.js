@@ -1,3 +1,5 @@
+import { writable, get } from 'svelte/store';
+
 /** @type {Record<string, number>} */
 export const BIBLE_BOOKS = {
   // Old Testament
@@ -68,11 +70,119 @@ export function getFirstLetters(text) {
 export async function getCycleStats(db) {
 	const progress = await db.reading_progress.toArray();
     
-    // Retrieve global completion count from metadata table
     const countRecord = await db.metadata.get('completion_counts');
     const globalMin = countRecord ? countRecord.value : 0;
 
 	const completedInCycle = progress.filter((/** @type {any} */ p) => p.is_completed).length;
 
 	return { globalMin, completedInCycle, progressMap: progress };
+}
+
+/**
+ * Reusable Action for Long Press mapping
+ * @param {any} node
+ * @param {number} threshold
+ */
+export function longpress(node, threshold = 500) {
+	/** @type {any} */
+	let timer;
+	/** @type {number} */
+	let startX;
+	/** @type {number} */
+	let startY;
+
+	const start = (/** @type {any} */ e) => {
+		if (e.type === 'touchstart') {
+			startX = e.touches[0].clientX;
+			startY = e.touches[0].clientY;
+		}
+		timer = setTimeout(() => {
+			node.dispatchEvent(new CustomEvent('longpress'));
+			// @ts-ignore
+			if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(50);
+		}, threshold);
+	};
+
+	const cancel = () => clearTimeout(timer);
+
+	const move = (/** @type {any} */ e) => {
+		if (e.type === 'touchmove') {
+			const dx = Math.abs(e.touches[0].clientX - startX);
+			const dy = Math.abs(e.touches[0].clientY - startY);
+			if (dx > 10 || dy > 10) cancel();
+		} else {
+			cancel();
+		}
+	};
+
+    const preventCtx = (/** @type {any} */ e) => e.preventDefault();
+
+	node.addEventListener('mousedown', start);
+	node.addEventListener('touchstart', start, { passive: true });
+	node.addEventListener('mouseup', cancel);
+	node.addEventListener('mouseleave', cancel);
+	node.addEventListener('touchend', cancel);
+	node.addEventListener('touchmove', move, { passive: true });
+    node.addEventListener('contextmenu', preventCtx);
+
+	return {
+		destroy() {
+			node.removeEventListener('mousedown', start);
+			node.removeEventListener('touchstart', start);
+			node.removeEventListener('mouseup', cancel);
+			node.removeEventListener('mouseleave', cancel);
+			node.removeEventListener('touchend', cancel);
+			node.removeEventListener('touchmove', move);
+            node.removeEventListener('contextmenu', preventCtx);
+		}
+	};
+}
+
+/**
+ * Centralized Selection Manager for generic lists
+ */
+export function createSelectionManager() {
+	const selected = writable(new Set());
+	const selectionMode = writable(false);
+	let justLongPressed = false;
+
+	function toggle(/** @type {any} */ id) {
+		selected.update(s => {
+			const newSet = new Set(s);
+			if (newSet.has(id)) {
+				newSet.delete(id);
+				if (newSet.size === 0) selectionMode.set(false);
+			} else {
+				newSet.add(id);
+			}
+			return newSet;
+		});
+	}
+
+	function clear() {
+		selected.set(new Set());
+		selectionMode.set(false);
+	}
+
+	function handleLongPress(/** @type {any} */ id) {
+		if (get(selectionMode)) return;
+		selectionMode.set(true);
+		justLongPressed = true;
+		toggle(id);
+		setTimeout(() => justLongPressed = false, 1000);
+	}
+
+	function handleClick(/** @type {any} */ id, /** @type {() => void | undefined} */ defaultAction) {
+		if (justLongPressed) {
+			justLongPressed = false;
+			return;
+		}
+		if (get(selectionMode)) {
+			toggle(id);
+		} else if (defaultAction) {
+			defaultAction();
+		}
+	}
+
+	return { selected, selectionMode, clear, handleLongPress, handleClick };
 }
