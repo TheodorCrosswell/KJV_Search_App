@@ -41,7 +41,7 @@
 	$: if (book && chapter) loadChapter();
 
 	async function toggleComplete() {
-		// Existing logic...
+		
 		const progressId = `${book}_${chapter}`;
 		
 		if (!isCompleted) {
@@ -129,7 +129,7 @@
 	<h1 class="text-2xl font-bold">{book} {chapter}</h1>
 	<div class="flex flex-wrap gap-2">
 		<button on:click={toggleMemoryQueue} class="rounded px-4 py-2 transition-colors {isInMemoryQueue ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-900 hover:bg-gray-300'}">
-			{isInMemoryQueue ? 'In Memory Queue' : 'Add to Queue'}
+			{isInMemoryQueue ? 'In Memory Queue' : 'Add to Memory Queue'}
 		</button>
 		<button on:click={toggleComplete} class="rounded px-4 py-2 transition-colors {isCompleted ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-900 hover:bg-gray-300'}">
 			{isCompleted ? 'Completed' : 'Mark Complete'}
@@ -197,5 +197,18 @@
 		{:else}
 			<span class="pointer-events-auto rounded-full bg-gray-500 px-4 py-3 text-sm font-semibold text-white opacity-80 shadow-lg md:px-6 md:text-base">End</span>
 		{/if}
+	</div>
+</div>
+
+
+<div class="mb-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+	<h1 class="text-2xl font-bold">{book} {chapter}</h1>
+	<div class="flex flex-wrap gap-2">
+		<button on:click={toggleMemoryQueue} class="rounded px-4 py-2 transition-colors {isInMemoryQueue ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-900 hover:bg-gray-300'}">
+			{isInMemoryQueue ? 'In Memory Queue' : 'Add to Memory Queue'}
+		</button>
+		<button on:click={toggleComplete} class="rounded px-4 py-2 transition-colors {isCompleted ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-900 hover:bg-gray-300'}">
+			{isCompleted ? 'Completed' : 'Mark Complete'}
+		</button>
 	</div>
 </div>
