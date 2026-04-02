@@ -4,6 +4,10 @@
 	import { goto } from '$app/navigation';
 	import { createSelectionManager, longpress } from '$lib/utils/helpers';
 	import SelectionActionBar from '$lib/components/SelectionActionBar.svelte';
+	import { headerTitle, headerAction } from '$lib/stores/header';
+
+	$: headerTitle.set('Favorite Verses');
+	$: headerAction.set(null);
 
 	/** @type {Array<any>} */
 	let favoritesWithText = [];
@@ -43,10 +47,6 @@
 		}
 	}
 </script>
-
-<div class="mb-6 flex items-center justify-between">
-	<h1 class="text-2xl font-bold">Favorite Verses</h1>
-</div>
 
 {#if favoritesWithText.length === 0}
 	<div class="rounded-lg bg-white p-8 text-center shadow">

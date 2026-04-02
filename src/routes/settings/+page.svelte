@@ -1,4 +1,10 @@
 <script>
+	
+	import { headerTitle, headerAction } from '$lib/stores/header';
+
+	$: headerTitle.set('Settings');
+	$: headerAction.set(null);
+	
 	let isUpdating = false;
 
 	async function updateApp() {
@@ -27,10 +33,6 @@
 		}
 	}
 </script>
-
-<div class="mb-6 flex items-center justify-between">
-	<h1 class="text-2xl font-bold">Settings</h1>
-</div>
 
 <div class="space-y-4">
 	<div class="rounded-lg bg-white p-4 shadow">

@@ -1,6 +1,10 @@
 <script>
 	import { onMount } from 'svelte';
 	import { db } from '$lib/db/db';
+	import { headerTitle, headerAction } from '$lib/stores/header';
+
+	$: headerTitle.set('Memory Queue');
+	$: headerAction.set(null);
 
 	/** @type {Array<any>} */
 	let queue = [];
@@ -24,10 +28,6 @@
 		}
 	}
 </script>
-
-<div class="mb-6 flex items-center justify-between">
-	<h1 class="text-2xl font-bold">Memory Queue</h1>
-</div>
 
 <div class="mb-6 flex gap-2">
 	<input bind:value={newEntry} placeholder="e.g. Genesis 1" class="flex-1 rounded border p-2" />

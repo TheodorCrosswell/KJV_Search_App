@@ -4,6 +4,7 @@
 	import { db } from '$lib/db/db';
 	import { onMount } from 'svelte';
 	import SelectionActionBar from '$lib/components/SelectionActionBar.svelte';
+	import { headerTitle, headerAction, headerActionText } from '$lib/stores/header';
 
 	const books = Object.keys(BIBLE_BOOKS);
 	
@@ -19,6 +20,19 @@
 		const progress = await db.reading_progress.toArray();
 		readChapters = new Set(progress.filter((/** @type {any} */ p) => p.is_completed).map((/** @type {any} */ p) => p.id));
 	});
+
+	// Reactively bind to the top home app bar based on selectedBook state
+	$: {
+		if (selectedBook) {
+			headerTitle.set(selectedBook);
+			headerAction.set(() => { selectedBook = null; clear(); });
+			headerActionText.set('Books');
+		} else {
+			headerTitle.set('Book selection');
+			headerAction.set(null);
+			headerActionText.set('Home');
+		}
+	}
 
 	$: getBookProgress = (/** @type {string} */ book) => {
 		const total = BIBLE_BOOKS[book];
@@ -110,11 +124,6 @@
 	</div>
 {:else}
 	<!-- Chapter Selection -->
-	<h2 class="mb-4 text-2xl font-bold flex items-center gap-4">
-		<button class="text-gray-500 hover:text-gray-900 text-sm py-1 px-3 border rounded" on:click={() => { selectedBook = null; clear(); }}>&larr; Books</button>
-		{selectedBook}
-	</h2>
-	
 	<div class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 sm:gap-3 pb-24">
 		{#each Array(BIBLE_BOOKS[selectedBook]) as _, i}
 			{@const chapNum = i + 1}

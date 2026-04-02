@@ -4,6 +4,10 @@
 	import { onMount } from 'svelte';
 	import { createSelectionManager, longpress } from '$lib/utils/helpers';
 	import SelectionActionBar from '$lib/components/SelectionActionBar.svelte';
+	import { headerTitle, headerAction } from '$lib/stores/header';
+
+	$: headerTitle.set('Bible Search');
+	$: headerAction.set(null);
 
 	let query = '';
 	/** @type {Array<any>} */
@@ -140,8 +144,6 @@
 		}
 	}
 </script>
-
-<h1 class="mb-4 text-2xl font-bold">Bible Search</h1>
 
 <div class="mb-6 flex flex-col gap-3 sm:flex-row">
 	<input type="text" bind:value={query} placeholder="Search here." class="flex-1 rounded border p-3 shadow-sm ring-blue-500 outline-none focus:ring-2" on:keydown={(/** @type {KeyboardEvent} */ e) => e.key === 'Enter' && handleSearch()} />
