@@ -30,18 +30,21 @@
 {#if dbReady}
   <!-- Global Top App Bar -->
   {#if $page.url.pathname !== '/'}
-    <div class="sticky top-0 z-50 flex min-h-[56px] w-full items-center justify-between bg-gray-50/95 px-4 py-3 shadow-sm backdrop-blur-sm border-b border-gray-200">
+    <!-- CHANGED: Replaced bg-gray-50/95 and border-gray-200 with CSS theme variables -->
+    <div class="sticky top-0 z-50 flex min-h-[56px] w-full items-center justify-between bg-[var(--bg-main)]/95 px-4 py-3 shadow-sm backdrop-blur-sm border-b border-[var(--border-color)]">
+      
       <!-- Left: Navigation Action -->
       <div class="flex items-center w-24 shrink-0">
         {#if $headerAction}
-          <button on:click={$headerAction} class="inline-flex items-center min-h-[44px] md:min-h-0 font-semibold text-blue-600 transition-colors hover:text-blue-800 active:scale-95">
+          <!-- CHANGED: Replaced text-blue-600 with var(--theme-color) -->
+          <button on:click={$headerAction} class="inline-flex items-center min-h-[44px] md:min-h-0 font-semibold text-[var(--theme-color)] transition-colors hover:opacity-80 active:scale-95">
             <svg class="mr-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width={2} d="M15 19l-7-7 7-7" />
             </svg>
             {$headerActionText}
           </button>
         {:else}
-          <a href="/" class="inline-flex items-center min-h-[44px] md:min-h-0 font-semibold text-blue-600 transition-colors hover:text-blue-800 active:scale-95">
+          <a href="/" class="inline-flex items-center min-h-[44px] md:min-h-0 font-semibold text-[var(--theme-color)] transition-colors hover:opacity-80 active:scale-95">
             <svg class="mr-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
             </svg>
@@ -53,7 +56,8 @@
       <!-- Center: Title -->
       <div class="flex-1 flex justify-center text-center px-2 overflow-hidden">
         {#if $headerTitle}
-          <h1 class="text-lg font-bold text-gray-900 truncate">{$headerTitle}</h1>
+          <!-- CHANGED: Replaced text-gray-900 with var(--text-main) -->
+          <h1 class="text-lg font-bold text-[var(--text-main)] truncate">{$headerTitle}</h1>
         {/if}
       </div>
 
@@ -66,10 +70,12 @@
     <slot />
   </main>
 {:else}
-  <div class="flex min-h-screen items-center justify-center bg-gray-50">
+  <!-- CHANGED: Replaced bg-gray-50 with var(--bg-main) -->
+  <div class="flex min-h-screen items-center justify-center bg-[var(--bg-main)]">
     <div class="text-center">
-      <p class="animate-pulse text-xl font-semibold text-blue-600">Initializing KJV Bible App...</p>
-      <p class="text-sm text-gray-500">This takes longer on first launch.</p>
+      <!-- CHANGED: Replaced text-blue-600 and text-gray-500 with theme variables -->
+      <p class="animate-pulse text-xl font-semibold text-[var(--theme-color)]">Initializing KJV Bible App...</p>
+      <p class="text-sm text-[var(--text-muted)]">This takes longer on first launch.</p>
     </div>
   </div>
 {/if}
