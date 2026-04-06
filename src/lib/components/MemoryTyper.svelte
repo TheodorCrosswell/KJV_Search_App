@@ -65,10 +65,10 @@
 >
   {#each words as word, i}
     <span class="
-      {currentIndex > i && userInputs[i].correct ? 'text-gray-900' : ''}
+      {currentIndex > i && userInputs[i].correct ? 'text-[var(--text-main)]' : ''}
       {currentIndex > i && !userInputs[i].correct ? 'text-red-500 line-through' : ''}
-      {currentIndex === i ? 'border-b-2 border-blue-500' : ''}
-      {currentIndex <= i && isVisible(i) ? 'text-gray-400' : ''}
+      {currentIndex === i ? 'border-b-2 border-[var(--theme-color)]' : ''}
+      {currentIndex <= i && isVisible(i) ? 'text-[var(--text-muted)]' : ''}
     ">
       {#if currentIndex > i || isVisible(i)}
         {word.original}
@@ -79,6 +79,6 @@
   {/each}
 </div>
 
-<div class="mt-4 text-sm text-gray-500">
+<div class="mt-4 text-sm text-[var(--text-muted)]">
   Progress: {currentIndex}/{words.length} | Errors: {errors}
 </div>

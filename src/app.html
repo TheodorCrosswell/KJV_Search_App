@@ -9,9 +9,32 @@
 			content="width=device-width, initial-scale=1, viewport-fit=cover"
 		/>
 		<title>KJV Bible</title>
+		<!-- Pre-init theme to prevent Flash of Unstyled Content (FOUC) -->
+		<script>
+			(function() {
+				try {
+					var dark = localStorage.getItem('isDarkMode') === 'true';
+					var color = localStorage.getItem('themeColor') || '#2563eb';
+					var css = ':root { ' +
+						'--theme-color: ' + color + '; ' +
+						'--theme-light: color-mix(in srgb, ' + color + ' 20%, transparent); ' +
+						'--bg-main: ' + (dark ? '#111827' : '#f9fafb') + '; ' +
+						'--bg-card: ' + (dark ? '#1f2937' : '#ffffff') + '; ' +
+						'--text-main: ' + (dark ? '#f9fafb' : '#111827') + '; ' +
+						'--text-muted: ' + (dark ? '#9ca3af' : '#6b7280') + '; ' +
+						'--border-color: ' + (dark ? '#374151' : '#e5e7eb') + '; ' +
+						'--hover-bg: ' + (dark ? '#374151' : '#f3f4f6') + '; ' +
+						'--header-bg: ' + (dark ? 'color-mix(in srgb, #111827 95%, transparent)' : 'color-mix(in srgb, #f9fafb 95%, transparent)') + '; ' +
+					'}';
+					var style = document.createElement('style');
+					style.innerHTML = css;
+					document.head.appendChild(style);
+				} catch(e) {}
+			})();
+		</script>
 		%sveltekit.head%
 	</head>
-	<body data-sveltekit-preload-data="hover" class="bg-gray-50 pb-20 text-gray-900">
+	<body data-sveltekit-preload-data="hover" class="pb-20 transition-colors duration-200" style="background-color: var(--bg-main); color: var(--text-main);">
 		<div style="display: contents">%sveltekit.body%</div>
 	</body>
 </html>

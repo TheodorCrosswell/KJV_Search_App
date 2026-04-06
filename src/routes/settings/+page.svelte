@@ -1,6 +1,7 @@
 <script>
-	
+	// Import your global stores directly
 	import { headerTitle, headerAction } from '$lib/stores/header';
+	import { themeColor, isDarkMode } from '$lib/stores/theme';
 
 	$: headerTitle.set('Settings');
 	$: headerAction.set(null);
@@ -10,13 +11,11 @@
 	async function updateApp() {
 		isUpdating = true;
 		try {
-			// 1. Delete all PWA caches (HTML, CSS, JS)
 			if ('caches' in window) {
 				const cacheNames = await caches.keys();
 				await Promise.all(cacheNames.map(name => caches.delete(name)));
 			}
 
-			// 2. Unregister all Service Workers
 			if ('serviceWorker' in navigator) {
 				const registrations = await navigator.serviceWorker.getRegistrations();
 				for (const reg of registrations) {
@@ -24,7 +23,6 @@
 				}
 			}
 
-			// 3. Reload the page to fetch the newest version directly from the network
 			window.location.reload();
 		} catch (error) {
 			console.error('Failed to update app:', error);
@@ -35,40 +33,53 @@
 </script>
 
 <div class="space-y-4">
-	<div class="rounded-lg bg-white p-4 shadow">
+	<!-- Theme Color -->
+	<div class="rounded-lg bg-[var(--bg-card)] border border-[var(--border-color)] p-4 shadow">
 		<div class="flex items-center justify-between">
-			<span class="font-medium">Dark Mode</span>
-			<input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-blue-600" />
-		</div>
-	</div>
-	
-	<div class="rounded-lg bg-white p-4 shadow">
-		<div class="flex items-center justify-between">
-			<span class="font-medium">Reading Font Size</span>
-			<input type="range" min="14" max="32" value="18" class="w-1/2" />
-		</div>
-	</div>
-	
-	<div class="rounded-lg bg-white p-4 shadow">
-		<div class="flex items-center justify-between">
-			<span class="font-medium">Red Letter Words</span>
-			<input type="checkbox" checked class="h-5 w-5 rounded border-gray-300 text-blue-600" />
+			<span class="font-medium text-[var(--text-main)]">Theme Color</span>
+			<div class="flex items-center gap-2">
+				<input type="color" bind:value={$themeColor} class="h-8 w-14 cursor-pointer rounded border-0 p-0 bg-transparent" />
+			</div>
 		</div>
 	</div>
 
-	<!-- New Update App Section -->
-	<div class="rounded-lg bg-white p-4 shadow">
+	<!-- Dark Mode -->
+	<div class="rounded-lg bg-[var(--bg-card)] border border-[var(--border-color)] p-4 shadow">
 		<div class="flex items-center justify-between">
-			<span class="font-medium">App Version</span>
+			<span class="font-medium text-[var(--text-main)]">Dark Mode</span>
+			<input type="checkbox" bind:checked={$isDarkMode} class="h-5 w-5 rounded border-[var(--border-color)] bg-[var(--bg-main)] text-[var(--theme-color)] focus:ring-[var(--theme-color)]" />
+		</div>
+	</div>
+	
+	<!-- Reading Font Size (For you to connect later) -->
+	<div class="rounded-lg bg-[var(--bg-card)] border border-[var(--border-color)] p-4 shadow">
+		<div class="flex items-center justify-between">
+			<span class="font-medium text-[var(--text-main)]">Reading Font Size</span>
+			<input type="range" min="14" max="32" value="18" class="w-1/2 accent-[var(--theme-color)]" />
+		</div>
+	</div>
+	
+	<!-- Red Letter Words (For you to connect later) -->
+	<div class="rounded-lg bg-[var(--bg-card)] border border-[var(--border-color)] p-4 shadow">
+		<div class="flex items-center justify-between">
+			<span class="font-medium text-[var(--text-main)]">Red Letter Words</span>
+			<input type="checkbox" checked class="h-5 w-5 rounded border-[var(--border-color)] bg-[var(--bg-main)] text-[var(--theme-color)] focus:ring-[var(--theme-color)]" />
+		</div>
+	</div>
+
+	<!-- App Version / Force Update -->
+	<div class="rounded-lg bg-[var(--bg-card)] border border-[var(--border-color)] p-4 shadow">
+		<div class="flex items-center justify-between">
+			<span class="font-medium text-[var(--text-main)]">App Version</span>
 			<button 
-				class="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 disabled:opacity-50"
+				class="rounded-md bg-[var(--theme-color)] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:opacity-80 transition-opacity disabled:opacity-50"
 				on:click={updateApp}
 				disabled={isUpdating}
 			>
 				{isUpdating ? 'Updating...' : 'Force Update App'}
 			</button>
 		</div>
-		<p class="mt-2 text-xs text-gray-500">
+		<p class="mt-2 text-xs text-[var(--text-muted)]">
 			Downloads the latest version of the app. Your reading progress and saved data will not be lost.
 		</p>
 	</div>

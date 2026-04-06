@@ -94,7 +94,7 @@
 		if (!currentSearchWords || currentSearchWords.length === 0) return text;
 		const pattern = currentSearchWords.map(escapeRegExp).sort((a,b) => b.length - a.length).join('|');
 		const regex = new RegExp(`\\b(${pattern})[a-zA-Z0-9'\\-]*`, 'gi');
-		return text.replace(regex, '<mark class="bg-yellow-200 text-gray-900 rounded-sm px-1">$&</mark>');
+		return text.replace(regex, '<mark class="bg-yellow-500/40 text-[var(--text-main)] rounded-sm px-1">$&</mark>');
 	}
 
 	/** @param {any} verse */
@@ -146,56 +146,56 @@
 </script>
 
 <div class="mb-6 flex flex-col gap-3 sm:flex-row">
-	<input type="text" bind:value={query} placeholder="Search here." class="flex-1 rounded border p-3 shadow-sm ring-blue-500 outline-none focus:ring-2" on:keydown={(/** @type {KeyboardEvent} */ e) => e.key === 'Enter' && handleSearch()} />
+	<input type="text" bind:value={query} placeholder="Search here." class="flex-1 rounded border border-[var(--border-color)] bg-[var(--bg-card)] text-[var(--text-main)] p-3 shadow-sm ring-[var(--theme-color)] outline-none focus:ring-2" on:keydown={(/** @type {KeyboardEvent} */ e) => e.key === 'Enter' && handleSearch()} />
 	<div class="flex w-full gap-2 sm:w-auto">
-		<select bind:value={selectedCategory} class="flex-1 rounded border bg-white p-3 text-gray-700 shadow-sm ring-blue-500 outline-none focus:ring-2 sm:w-48">
+		<select bind:value={selectedCategory} class="flex-1 rounded border border-[var(--border-color)] bg-[var(--bg-card)] p-3 text-[var(--text-main)] shadow-sm ring-[var(--theme-color)] outline-none focus:ring-2 sm:w-48">
 			<option value="All">All Books</option>
 			{#each Object.keys(BOOK_CATEGORIES) as category}
 				<option value={category}>{category}</option>
 			{/each}
 		</select>
-		<button on:click={handleSearch} class="rounded bg-blue-600 px-6 py-3 font-semibold text-white">Search</button>
+		<button on:click={handleSearch} class="rounded bg-[var(--theme-color)] px-6 py-3 font-semibold text-white transition-opacity hover:opacity-80">Search</button>
 	</div>
 </div>
 
 {#if recentSearches.length > 0}
 	<div class="mb-6">
-		<h2 class="mb-2 text-sm font-semibold uppercase tracking-wider text-gray-500">Recent Searches</h2>
+		<h2 class="mb-2 text-sm font-semibold uppercase tracking-wider text-[var(--text-muted)]">Recent Searches</h2>
 		<div class="flex flex-wrap gap-2">
 			{#each recentSearches as rq}
-				<button class="rounded-full bg-gray-100 px-4 py-1.5 text-sm text-gray-700 transition hover:bg-gray-200" on:click={() => { query = rq; handleSearch(); }}>{rq}</button>
+				<button class="rounded-full bg-[var(--hover-bg)] px-4 py-1.5 text-sm text-[var(--text-main)] transition hover:opacity-80" on:click={() => { query = rq; handleSearch(); }}>{rq}</button>
 			{/each}
 		</div>
 	</div>
 {/if}
 
 {#if isSearching}
-	<p>Searching...</p>
+	<p class="text-[var(--text-main)]">Searching...</p>
 {:else}
-	<p class="mb-4 text-gray-500">{results.length} results found.</p>
+	<p class="mb-4 text-[var(--text-muted)]">{results.length} results found.</p>
 	<div class="space-y-3 pb-24">
 		{#each results as res}
 			<div
 				role="button"
 				tabindex="0"
-				class="group flex cursor-pointer select-none items-start gap-4 rounded p-4 shadow transition-colors {$selected.has(res.id) ? 'bg-blue-100' : 'bg-white hover:bg-gray-50'}"
+				class="group flex cursor-pointer select-none items-start gap-4 rounded border border-[var(--border-color)] p-4 shadow transition-colors {$selected.has(res.id) ? 'bg-[var(--theme-light)]' : 'bg-[var(--bg-card)] hover:bg-[var(--hover-bg)]'}"
 				use:longpress
 				on:longpress={() => handleLongPress(res.id)}
 				on:click={() => handleClick(res.id, () => {})}
 				on:keydown={(/** @type {KeyboardEvent} */ e) => e.key === 'Enter' && handleClick(res.id, () => {})}
 			>
 				<div class="flex-1 text-left">
-					<h3 class="mb-1 font-bold {$selected.has(res.id) ? 'text-blue-800' : 'text-blue-600'}">{res.citation}</h3>
-					<p class="text-gray-800">{@html highlight(res.text)}</p>
+					<h3 class="mb-1 font-bold text-[var(--theme-color)]">{res.citation}</h3>
+					<p class="text-[var(--text-main)]">{@html highlight(res.text)}</p>
 				</div>
-				<button on:click|stopPropagation={() => toggleFavorite(res)} class="mt-1 text-2xl transition-colors {favoriteIds.has(res.id) ? 'text-red-500' : 'text-gray-200 hover:text-red-300'}" aria-label="Toggle Favorite">♥</button>
+				<button on:click|stopPropagation={() => toggleFavorite(res)} class="mt-1 text-2xl transition-colors {favoriteIds.has(res.id) ? 'text-red-500' : 'text-[var(--border-color)] hover:text-red-400'}" aria-label="Toggle Favorite">♥</button>
 			</div>
 		{/each}
 	</div>
 {/if}
 
 <SelectionActionBar selectedCount={$selected.size} onClear={clear}>
-	<button on:click={copySelected} class="transition-colors hover:text-blue-300">Copy</button>
-	<button on:click={favoriteSelected} class="transition-colors hover:text-red-300">Favorite</button>
-	<button on:click={locateSelected} class="transition-colors hover:text-green-300">Locate</button>
+	<button on:click={copySelected} class="transition-colors hover:text-[var(--theme-color)]">Copy</button>
+	<button on:click={favoriteSelected} class="transition-colors hover:text-red-400">Favorite</button>
+	<button on:click={locateSelected} class="transition-colors hover:text-green-400">Locate</button>
 </SelectionActionBar>

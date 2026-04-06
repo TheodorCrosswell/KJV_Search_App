@@ -49,10 +49,10 @@
 </script>
 
 {#if favoritesWithText.length === 0}
-	<div class="rounded-lg bg-white p-8 text-center shadow">
-		<p class="text-gray-500">You haven't favorited any verses yet.</p>
-		<p class="mt-2 text-sm text-gray-400">Read a chapter and click the heart icon (♥) to add verses to your favorites.</p>
-		<a href="/read" class="mt-6 inline-block rounded bg-blue-600 px-6 py-2 text-white">Start Reading</a>
+	<div class="rounded-lg bg-[var(--bg-card)] border border-[var(--border-color)] p-8 text-center shadow">
+		<p class="text-[var(--text-muted)]">You haven't favorited any verses yet.</p>
+		<p class="mt-2 text-sm text-[var(--text-muted)] opacity-80">Read a chapter and click the heart icon (♥) to add verses to your favorites.</p>
+		<a href="/read" class="mt-6 inline-block rounded bg-[var(--theme-color)] px-6 py-2 text-white hover:opacity-80 transition-opacity">Start Reading</a>
 	</div>
 {:else}
 	<div class="space-y-4 pb-24">
@@ -60,19 +60,19 @@
 			<div 
 				role="button"
 				tabindex="0"
-				class="relative rounded-lg p-4 pr-12 shadow cursor-pointer select-none transition-colors {$selected.has(fav.id) ? 'bg-blue-100' : 'bg-white hover:bg-gray-50'}"
+				class="relative rounded-lg p-4 pr-12 shadow border border-[var(--border-color)] cursor-pointer select-none transition-colors {$selected.has(fav.id) ? 'bg-[var(--theme-light)]' : 'bg-[var(--bg-card)] hover:bg-[var(--hover-bg)]'}"
 				use:longpress
 				on:longpress={() => handleLongPress(fav.id)}
 				on:click={() => handleClick(fav.id, () => {})}
 				on:keydown={(/** @type {KeyboardEvent} */ e) => e.key === 'Enter' && handleClick(fav.id, () => {})}
 			>
-				<h3 class="mb-1 font-bold {$selected.has(fav.id) ? 'text-blue-800' : 'text-blue-600'}">{fav.citation}</h3>
-				<p class="mb-3 text-gray-800">{fav.text}</p>
-				<p class="text-xs text-gray-400">Favorited on {new Date(fav.timestamp).toLocaleDateString()}</p>
+				<h3 class="mb-1 font-bold text-[var(--theme-color)]">{fav.citation}</h3>
+				<p class="mb-3 text-[var(--text-main)]">{fav.text}</p>
+				<p class="text-xs text-[var(--text-muted)]">Favorited on {new Date(fav.timestamp).toLocaleDateString()}</p>
 				
 				<button 
 					on:click|stopPropagation={() => removeFavorite(fav.id)}
-					class="absolute right-4 top-4 text-2xl text-red-500 transition-colors hover:text-gray-300"
+					class="absolute right-4 top-4 text-2xl text-red-500 transition-colors hover:text-red-400"
 					aria-label="Remove favorite"
 				>
 					♥
@@ -83,6 +83,6 @@
 {/if}
 
 <SelectionActionBar selectedCount={$selected.size} onClear={clear}>
-	<button on:click={copySelected} class="transition-colors hover:text-blue-300">Copy</button>
-	<button on:click={locateSelected} class="transition-colors hover:text-green-300">Locate</button>
+	<button on:click={copySelected} class="transition-colors hover:text-[var(--theme-color)]">Copy</button>
+	<button on:click={locateSelected} class="transition-colors hover:text-green-400">Locate</button>
 </SelectionActionBar>

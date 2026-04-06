@@ -49,22 +49,22 @@
 </script>
 
 <div class="mb-6">
-	<h1 class="text-2xl font-bold">{book} {chapter}:{verse}</h1>
-	<p class="mt-1 text-gray-500">Current Level: {currentLevel} / 4</p>
+	<h1 class="text-2xl font-bold text-[var(--text-main)]">{book} {chapter}:{verse}</h1>
+	<p class="mt-1 text-[var(--text-muted)]">Current Level: {currentLevel} / 4</p>
 </div>
 
-<div class="min-h-[200px] rounded bg-white p-6 shadow">
+<div class="min-h-[200px] rounded border border-[var(--border-color)] bg-[var(--bg-card)] p-6 shadow">
 	{#if statusMessage}
 		<div class="text-center">
 			<p
 				class="mb-4 text-xl font-semibold {statusMessage.includes('Passed')
-					? 'text-green-600'
-					: 'text-red-600'}"
+					? 'text-green-500'
+					: 'text-red-500'}"
 			>
 				{statusMessage}
 			</p>
-			<button on:click={retry} class="rounded bg-blue-600 px-6 py-2 text-white">Continue</button>
-			<a href="/memory/{book}/{chapter}" class="ml-2 rounded bg-gray-200 px-6 py-2 text-gray-800"
+			<button on:click={retry} class="rounded bg-[var(--theme-color)] px-6 py-2 text-white hover:opacity-80 transition-opacity">Continue</button>
+			<a href="/memory/{book}/{chapter}" class="ml-2 rounded border border-[var(--border-color)] bg-[var(--hover-bg)] px-6 py-2 text-[var(--text-main)] hover:opacity-80 transition-opacity"
 				>Back to Chapter</a
 			>
 		</div>
@@ -73,17 +73,17 @@
 	{:else if currentLevel === 4}
 		<div class="py-10 text-center">
 			<span class="text-4xl">🎉</span>
-			<h2 class="mt-4 text-2xl font-bold text-green-600">Fully Memorized!</h2>
+			<h2 class="mt-4 text-2xl font-bold text-green-500">Fully Memorized!</h2>
 			<button
 				on:click={() => {
 					currentLevel = 3;
 					retry();
 				}}
-				class="mt-4 rounded bg-gray-200 px-4 py-2">Practice Again (Level 3)</button
+				class="mt-4 rounded border border-[var(--border-color)] bg-[var(--hover-bg)] px-4 py-2 text-[var(--text-main)] hover:opacity-80 transition-opacity">Practice Again (Level 3)</button
 			>
 		</div>
 	{/if}
 </div>
-<p class="mt-4 text-sm text-gray-400">
+<p class="mt-4 text-sm text-[var(--text-muted)] opacity-80">
 	Type the first letter of each word to practice. Punctuation is ignored.
 </p>

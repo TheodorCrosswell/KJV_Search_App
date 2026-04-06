@@ -30,17 +30,17 @@
 </script>
 
 <div class="mb-6 flex gap-2">
-	<input bind:value={newEntry} placeholder="e.g. Genesis 1" class="flex-1 rounded border p-2" />
-	<button on:click={addToQueue} class="rounded bg-blue-600 px-4 py-2 text-white">Add</button>
+	<input bind:value={newEntry} placeholder="e.g. Genesis 1" class="flex-1 rounded border border-[var(--border-color)] bg-[var(--bg-card)] text-[var(--text-main)] p-2 focus:ring-[var(--theme-color)] outline-none" />
+	<button on:click={addToQueue} class="rounded bg-[var(--theme-color)] px-4 py-2 text-white hover:opacity-80 transition-opacity">Add</button>
 </div>
 
 <div class="space-y-2">
 	{#each queue as item}
 		<a
 			href="/memory/{item.citation.split('_')[0]}/{item.citation.split('_')[1]}"
-			class="block rounded bg-white p-4 shadow hover:bg-gray-50"
+			class="block rounded bg-[var(--bg-card)] border border-[var(--border-color)] p-4 shadow hover:bg-[var(--hover-bg)]"
 		>
-			<h2 class="text-lg font-semibold">{item.citation.replace('_', ' ')}</h2>
+			<h2 class="text-lg font-semibold text-[var(--text-main)]">{item.citation.replace('_', ' ')}</h2>
 		</a>
 	{/each}
 </div>
