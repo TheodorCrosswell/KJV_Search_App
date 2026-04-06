@@ -24,7 +24,8 @@
 	}
 
 	$: if (book && chapter && verse) loadData();
-
+	
+	/** @param {number} accuracy */
 	async function handleFinish(accuracy) {
 		if (accuracy >= 0.9) {
 			currentLevel = Math.min(currentLevel + 1, 4);

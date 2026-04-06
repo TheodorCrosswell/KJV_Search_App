@@ -8,6 +8,8 @@
 
 	/** @type {Array<any>} */
 	let verses = [];
+
+	/** @type {Record<string, number>} */
 	let progressMap = {};
 
 	async function loadVerses() {
