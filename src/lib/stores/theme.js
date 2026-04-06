@@ -4,7 +4,7 @@ import { writable, get } from 'svelte/store';
 const browser = typeof window !== 'undefined';
 
 // Get initial values from localStorage or fallback to defaults
-const initialDark = browser ? localStorage.getItem('isDarkMode') === 'true' : false;
+const initialDark = browser ? localStorage.getItem('isDarkMode') === 'true' : true;
 const initialColor = browser ? localStorage.getItem('themeColor') || '#2563eb' : '#2563eb';
 
 // Create the Svelte writable stores

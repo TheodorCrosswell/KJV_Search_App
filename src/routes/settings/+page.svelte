@@ -50,22 +50,6 @@
 			<input type="checkbox" bind:checked={$isDarkMode} class="h-5 w-5 rounded border-[var(--border-color)] bg-[var(--bg-main)] text-[var(--theme-color)] focus:ring-[var(--theme-color)]" />
 		</div>
 	</div>
-	
-	<!-- Reading Font Size (For you to connect later) -->
-	<div class="rounded-lg bg-[var(--bg-card)] border border-[var(--border-color)] p-4 shadow">
-		<div class="flex items-center justify-between">
-			<span class="font-medium text-[var(--text-main)]">Reading Font Size</span>
-			<input type="range" min="14" max="32" value="18" class="w-1/2 accent-[var(--theme-color)]" />
-		</div>
-	</div>
-	
-	<!-- Red Letter Words (For you to connect later) -->
-	<div class="rounded-lg bg-[var(--bg-card)] border border-[var(--border-color)] p-4 shadow">
-		<div class="flex items-center justify-between">
-			<span class="font-medium text-[var(--text-main)]">Red Letter Words</span>
-			<input type="checkbox" checked class="h-5 w-5 rounded border-[var(--border-color)] bg-[var(--bg-main)] text-[var(--theme-color)] focus:ring-[var(--theme-color)]" />
-		</div>
-	</div>
 
 	<!-- App Version / Force Update -->
 	<div class="rounded-lg bg-[var(--bg-card)] border border-[var(--border-color)] p-4 shadow">
