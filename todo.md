@@ -1,13 +1,12 @@
-- Add ability to select one or multiple books or chapters in the book selection screen and mark the selected items as read or add them to the memory queue by long pressing the book or chapter tile and selecting one or multiple tiles. Use the same mechanism of the long press and action bar with the options Mark as Read/Add to Memory.
-
-- Consolidate the long press selection mechanism to a reusable function. Also add ability to select and copy/locate verses from the verses screen. 
+- Add feature where if all chapters are read, show a button that resets all the chapters to the unread state.
 
 - Fix memory game: it currently has all the words hidden when you play level 1, and they become visible after you press the first key. Make it so that on level 1 the words are visible from the beginning, even before you press any key.
-
 - Add Bible memory review reminder/alert. users should review a chapter after memorizing it: once every day for a week, Once a week for a month, and once a month for a year, and then once a year. Users should also be able to pause or skip a memory reminder.
 
-- Add dark theme and ability to choose custom colors for various aspects of the UI. 
+- Add icons next to their respective options in the action bar that comes up when you long press.
 
-- Change search algorithm and highlight words in the verses that match the search query. Capitalization does not matter at all. If you search one word, it will only return verses that contain at least one word that starts with the search word (e.g. "Ape" will return "ape" or "apes" but wil not return "gaped".). If multiple words are in the query, the verse must contain words that start with each search word (e.g. "jes wep" will return the verse "Jesus wept." but it will not return all the verses that contain "jes" or "wep" as the start of one of the words.) The 10 most recent search queries must be saved in a queue (first in first out), so that when a new search is made, the oldest saved search query (if over 10 saved queries) is eliminated. The recent search queries must be displayed in a list below the search bar, and when the user click on one of the saved queries, it will fill that query text into the search bar, but the user must press the search button in order to start the search.
+- Consolidate the verses being diplayed to a common component that is shared among the different pages. Make sure to remove the heart from the verses and display the verses as wide as the screen when in portrait mode.
 
-- Make UI fit both on laptop and mobile. CUrrently the reading screen works great on laptop but is way too small on mobile (and the buttons are too small on mobile). The book/chapter selection screen works great on mobile but the tiles are too big for the laptop screen and you have to scroll down to see all the tiles. Make it so that when the user is in portait mode, the tiles are 6 wide 11 vertical, but when in landscape the tiles are 11 wide 6 vertical. Also make it so that all the tiles are in view and the user does not have to scroll down to see them.
+- Fix some of the abbreviations for book names being the same (e.g. 1C = 1 Chronicles and 1 Corinthians)
+
+- Fix long press not selecting the way I want it to. Make tapping any verse in the search screen to trigger long press functionality. Maybe just remove the delay and make it trigger when you tap a verse, not necessarily long press.
