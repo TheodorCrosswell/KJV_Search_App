@@ -125,14 +125,6 @@
 			on:keydown={(/** @type {KeyboardEvent} */ e) => e.key === 'Enter' && handleClick(v.id, () => {})}
 		>
 			<p class="flex-1 text-lg text-[var(--text-main)]"><sup class="mr-1 text-xs font-bold">{v.verse}</sup>{v.text}</p>
-			
-			<button 
-				on:click|stopPropagation={() => toggleFavorite(v)}
-				class="mt-1 text-2xl transition-colors {favoriteIds.has(v.id) ? 'text-red-500' : 'text-[var(--border-color)] hover:text-red-400'}"
-				aria-label="Toggle Favorite"
-			>
-				♥
-			</button>
 		</div>
 	{/each}
 </div>
