@@ -109,7 +109,8 @@
 	</div>
 </div>
 
-<div class="space-y-1 rounded border border-[var(--border-color)] bg-[var(--bg-card)] p-4 shadow sm:p-6">
+<!-- Added portrait styling to pull edges out, hide side borders and roundness -->
+<div class="space-y-1 rounded border border-[var(--border-color)] bg-[var(--bg-card)] p-4 shadow sm:p-6 portrait:-mx-4 portrait:rounded-none portrait:border-x-0 portrait:px-2">
 	{#if verses.length === 0}
 		<p class="text-[var(--text-main)]">Loading verses...</p>
 	{/if}
