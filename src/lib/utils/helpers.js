@@ -83,7 +83,7 @@ export async function getCycleStats(db) {
  * @param {any} node
  * @param {number} threshold
  */
-export function longpress(node, threshold = 500) {
+export function longpress(node, threshold = 300) {
 	/** @type {any} */
 	let timer;
 	/** @type {number} */
