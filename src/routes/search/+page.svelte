@@ -2,7 +2,7 @@
 	import { db } from '$lib/db/db';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
-	import { createSelectionManager, longpress } from '$lib/utils/helpers';
+	import { createSelectionManager, longpress, copySelected, favoriteSelected, locateSelected } from '$lib/utils/helpers';
 	import SelectionActionBar from '$lib/components/SelectionActionBar.svelte';
 	import { headerTitle, headerAction } from '$lib/stores/header';
 
@@ -112,37 +112,6 @@
 		}
 		favoriteIds = favoriteIds; 
 	}
-
-	async function copySelected() {
-		const sortedVerses = results.filter(v => $selected.has(v.id));
-		const textToCopy = sortedVerses.map(v => `${v.citation} ${v.text}`).join('\n');
-		try { await navigator.clipboard.writeText(textToCopy); } catch (err) {}
-		clear();
-	}
-
-	async function favoriteSelected() {
-		const sortedVerses = results.filter(v => $selected.has(v.id));
-		for (let v of sortedVerses) {
-			if (!favoriteIds.has(v.id)) {
-				await db.favorite_verses.put({
-					id: v.id,
-					citation: v.citation,
-					timestamp: Date.now()
-				});
-				favoriteIds.add(v.id);
-			}
-		}
-		favoriteIds = favoriteIds; 
-		clear();
-	}
-
-	function locateSelected() {
-		const firstSelectedId = Array.from($selected)[0];
-		const targetVerse = results.find(v => v.id === firstSelectedId);
-		if (targetVerse) {
-			goto(`/read/${targetVerse.book}/${targetVerse.chapter}`);
-		}
-	}
 </script>
 
 <div class="mb-6 flex flex-col gap-3 sm:flex-row">
@@ -195,7 +164,7 @@
 {/if}
 
 <SelectionActionBar selectedCount={$selected.size} onClear={clear}>
-	<button on:click={copySelected} class="transition-colors hover:text-[var(--theme-color)]">Copy</button>
-	<button on:click={favoriteSelected} class="transition-colors hover:text-red-400">Favorite</button>
-	<button on:click={locateSelected} class="transition-colors hover:text-green-400">Locate</button>
+	<button on:click={() => copySelected($selected, results, clear)} class="transition-colors hover:text-[var(--theme-color)]">Copy</button>
+	<button on:click={() => favoriteSelected($selected, results, favoriteIds, db, (f) => favoriteIds = f, clear)} class="transition-colors hover:text-red-400">Favorite</button>
+	<button on:click={() => locateSelected($selected, results, goto)} class="transition-colors hover:text-green-400">Locate</button>
 </SelectionActionBar>

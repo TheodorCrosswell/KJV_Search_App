@@ -1,7 +1,7 @@
 <script>
 	import { page } from '$app/stores';
 	import { db } from '$lib/db/db';
-	import { BIBLE_BOOKS, TOTAL_CHAPTERS, createSelectionManager, longpress } from '$lib/utils/helpers';
+	import { BIBLE_BOOKS, TOTAL_CHAPTERS, createSelectionManager, longpress, copySelected, favoriteSelected } from '$lib/utils/helpers';
 	import SelectionActionBar from '$lib/components/SelectionActionBar.svelte';
 
 	$: book = $page.params.book;
@@ -95,34 +95,6 @@
 		}
 		favoriteIds = favoriteIds; 
 	}
-
-	async function copySelected() {
-		const sortedVerses = verses.filter(v => $selected.has(v.id));
-		const textToCopy = sortedVerses.map(v => `${v.citation} ${v.text}`).join('\n');
-		
-		try {
-			await navigator.clipboard.writeText(textToCopy);
-		} catch (err) {
-			console.error('Failed to copy text: ', err);
-		}
-		clear();
-	}
-
-	async function favoriteSelected() {
-		const sortedVerses = verses.filter(v => $selected.has(v.id));
-		for (let v of sortedVerses) {
-			if (!favoriteIds.has(v.id)) {
-				await db.favorite_verses.put({
-					id: v.id,
-					citation: v.citation,
-					timestamp: Date.now()
-				});
-				favoriteIds.add(v.id);
-			}
-		}
-		favoriteIds = favoriteIds; 
-		clear();
-	}
 </script>
 
 <div class="mb-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -167,8 +139,8 @@
 <div class="h-32"></div>
 
 <SelectionActionBar selectedCount={$selected.size} bottomClass="bottom-24" onClear={clear}>
-	<button on:click={copySelected} class="transition-colors hover:text-[var(--theme-color)]">Copy</button>
-	<button on:click={favoriteSelected} class="transition-colors hover:text-red-400">Favorite</button>
+	<button on:click={() => copySelected($selected, verses, clear)} class="transition-colors hover:text-[var(--theme-color)]">Copy</button>
+	<button on:click={() => favoriteSelected($selected, verses, favoriteIds, db, (f) => favoriteIds = f, clear)} class="transition-colors hover:text-red-400">Favorite</button>
 </SelectionActionBar>
 
 <div class="pointer-events-none fixed bottom-6 left-0 right-0 z-40 mx-auto flex w-full max-w-4xl justify-between gap-2 px-4">

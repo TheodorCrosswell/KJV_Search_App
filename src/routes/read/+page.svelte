@@ -1,6 +1,6 @@
 <script>
 	import { goto } from '$app/navigation';
-	import { BIBLE_BOOKS, BOOK_ABBREVIATIONS, createSelectionManager, longpress } from '$lib/utils/helpers';
+	import { BIBLE_BOOKS, BOOK_ABBREVIATIONS, createSelectionManager, longpress, markSelectedAs, memorySelected } from '$lib/utils/helpers';
 	import { db } from '$lib/db/db';
 	import { onMount } from 'svelte';
 	import SelectionActionBar from '$lib/components/SelectionActionBar.svelte';
@@ -42,61 +42,6 @@
 		}
 		return (completedCount / total) * 100;
 	};
-
-	async function markSelectedAs(/** @type {boolean} */ isRead) {
-		const now = Date.now();
-		/** @type {Array<any>} */
-		const updates = [];
-		
-		if (!selectedBook) {
-			for (const book of $selected) {
-				const total = BIBLE_BOOKS[book];
-				for (let i = 1; i <= total; i++) {
-					updates.push({ id: `${book}_${i}`, completion_date: now, is_completed: isRead });
-					if (isRead) readChapters.add(`${book}_${i}`);
-					else readChapters.delete(`${book}_${i}`);
-				}
-			}
-		} else {
-			for (const chap of $selected) {
-				updates.push({ id: `${selectedBook}_${chap}`, completion_date: now, is_completed: isRead });
-				if (isRead) readChapters.add(`${selectedBook}_${chap}`);
-				else readChapters.delete(`${selectedBook}_${chap}`);
-			}
-		}
-		
-		await db.reading_progress.bulkPut(updates);
-		readChapters = readChapters; // trigger reactivity
-		clear();
-	}
-
-	async function memorySelected(/** @type {boolean} */ add) {
-		/** @type {Array<any>} */
-		const updates = [];
-		/** @type {Array<string>} */
-		const deletes = [];
-		
-		if (!selectedBook) {
-			for (const book of $selected) {
-				const total = BIBLE_BOOKS[book];
-				for (let i = 1; i <= total; i++) {
-					const citation = `${book}_${i}`;
-					if (add) updates.push({ citation });
-					else deletes.push(citation);
-				}
-			}
-		} else {
-			for (const chap of $selected) {
-				const citation = `${selectedBook}_${chap}`;
-				if (add) updates.push({ citation });
-				else deletes.push(citation);
-			}
-		}
-		
-		if (add) await db.memory_queue.bulkPut(updates);
-		else await db.memory_queue.bulkDelete(deletes);
-		clear();
-	}
 </script>
 
 {#if !selectedBook}
@@ -141,8 +86,8 @@
 {/if}
 
 <SelectionActionBar selectedCount={$selected.size} onClear={clear}>
-	<button on:click={() => markSelectedAs(true)} class="transition-colors hover:text-green-400">Mark Read</button>
-	<button on:click={() => markSelectedAs(false)} class="transition-colors hover:text-[var(--text-muted)]">Mark Unread</button>
-	<button on:click={() => memorySelected(true)} class="transition-colors hover:text-purple-400">+ Memory</button>
-	<button on:click={() => memorySelected(false)} class="transition-colors hover:text-red-400">- Memory</button>
+	<button on:click={() => markSelectedAs($selected, selectedBook, true, readChapters, db, (rc) => readChapters = rc, clear)} class="transition-colors hover:text-green-400">Mark Read</button>
+	<button on:click={() => markSelectedAs($selected, selectedBook, false, readChapters, db, (rc) => readChapters = rc, clear)} class="transition-colors hover:text-[var(--text-muted)]">Mark Unread</button>
+	<button on:click={() => memorySelected($selected, selectedBook, true, db, clear)} class="transition-colors hover:text-purple-400">+ Memory</button>
+	<button on:click={() => memorySelected($selected, selectedBook, false, db, clear)} class="transition-colors hover:text-red-400">- Memory</button>
 </SelectionActionBar>

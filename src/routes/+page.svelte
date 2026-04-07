@@ -17,7 +17,7 @@
 
 <h1 class="mb-8 mt-4 text-center text-3xl font-extrabold text-[var(--text-main)]">KJV Bible App</h1>
 
-<!-- 2-column, 3-row grid (total 6 items) -->
+<!-- 2-column grid -->
 <div class="grid grid-cols-2 gap-4">
 	<!-- Top Left: Continue reading -->
 	<a href={continueLink} class="flex h-32 flex-col items-center justify-center rounded-xl bg-[var(--theme-color)] p-4 text-center shadow-md transition-transform active:scale-95">
@@ -48,5 +48,10 @@
 	<!-- Bottom Right: Favorite Bible verses -->
 	<a href="/favorites" class="flex h-32 flex-col items-center justify-center rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] p-4 text-center shadow-sm transition-transform hover:bg-[var(--hover-bg)] active:scale-95">
 		<span class="text-lg font-bold leading-tight text-[var(--text-main)]">Favorite<br>Verses</span>
+	</a>
+
+	<!-- Full Width Bottom: Soulwinning -->
+	<a href="/soulwinning" class="col-span-2 flex h-16 flex-col items-center justify-center rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] p-4 text-center shadow-sm transition-transform hover:bg-[var(--hover-bg)] active:scale-95">
+		<span class="text-lg font-bold text-[var(--text-main)]">Soulwinning</span>
 	</a>
 </div>

@@ -186,3 +186,138 @@ export function createSelectionManager() {
 
 	return { selected, selectionMode, clear, handleLongPress, handleClick };
 }
+
+/**
+ * Copies the text of the selected verses to the clipboard and clears the selection
+ * @param {Set<any>} selectedIds 
+ * @param {Array<any>} verses 
+ * @param {() => void} clearFn 
+ */
+export async function copySelected(selectedIds, verses, clearFn) {
+	const sortedVerses = verses.filter(v => selectedIds.has(v.id));
+	const textToCopy = sortedVerses.map(v => `${v.citation} ${v.text}`).join('\n');
+	
+	try {
+		await navigator.clipboard.writeText(textToCopy);
+	} catch (err) {
+		console.error('Failed to copy text: ', err);
+	}
+	clearFn();
+}
+
+/**
+ * Adds selected verses to favorites in the DB, updates local state, and clears selection
+ * @param {Set<any>} selectedIds 
+ * @param {Array<any>} verses 
+ * @param {Set<any>} favoriteIds 
+ * @param {import('../db/db').BibleDatabase} db 
+ * @param {(newFavs: Set<any>) => void} updateFavsFn 
+ * @param {() => void} clearFn 
+ */
+export async function favoriteSelected(selectedIds, verses, favoriteIds, db, updateFavsFn, clearFn) {
+	const sortedVerses = verses.filter(v => selectedIds.has(v.id));
+	let updatedFavs = new Set(favoriteIds);
+	
+	for (let v of sortedVerses) {
+		if (!updatedFavs.has(v.id)) {
+			await db.favorite_verses.put({
+				id: v.id,
+				citation: v.citation,
+				timestamp: Date.now()
+			});
+			updatedFavs.add(v.id);
+		}
+	}
+	
+	updateFavsFn(updatedFavs);
+	clearFn();
+}
+
+/**
+ * Navigates directly to the first selected verse's chapter in the reader
+ * @param {Set<any>} selectedIds 
+ * @param {Array<any>} verses 
+ * @param {(url: string) => void} gotoFn 
+ */
+export function locateSelected(selectedIds, verses, gotoFn) {
+	const firstSelectedId = Array.from(selectedIds)[0];
+	const targetVerse = verses.find(v => v.id === firstSelectedId);
+	
+	if (targetVerse && targetVerse.book) {
+		gotoFn(`/read/${targetVerse.book}/${targetVerse.chapter}`);
+	}
+}
+
+/**
+ * Marks selected chapters/books as read or unread
+ * @param {Set<any>} selectedIds 
+ * @param {string | null} selectedBook 
+ * @param {boolean} isRead 
+ * @param {Set<string>} readChapters 
+ * @param {import('../db/db').BibleDatabase} db 
+ * @param {(updated: Set<string>) => void} updateReadChaptersFn 
+ * @param {() => void} clearFn 
+ */
+export async function markSelectedAs(selectedIds, selectedBook, isRead, readChapters, db, updateReadChaptersFn, clearFn) {
+	const now = Date.now();
+	/** @type {Array<any>} */
+	const updates = [];
+	let updatedReadChapters = new Set(readChapters);
+	
+	if (!selectedBook) {
+		for (const book of selectedIds) {
+			const total = BIBLE_BOOKS[book];
+			for (let i = 1; i <= total; i++) {
+				updates.push({ id: `${book}_${i}`, completion_date: now, is_completed: isRead });
+				if (isRead) updatedReadChapters.add(`${book}_${i}`);
+				else updatedReadChapters.delete(`${book}_${i}`);
+			}
+		}
+	} else {
+		for (const chap of selectedIds) {
+			updates.push({ id: `${selectedBook}_${chap}`, completion_date: now, is_completed: isRead });
+			if (isRead) updatedReadChapters.add(`${selectedBook}_${chap}`);
+			else updatedReadChapters.delete(`${selectedBook}_${chap}`);
+		}
+	}
+	
+	await db.reading_progress.bulkPut(updates);
+	updateReadChaptersFn(updatedReadChapters);
+	clearFn();
+}
+
+/**
+ * Adds or removes selected chapters/books from the memory queue
+ * @param {Set<any>} selectedIds 
+ * @param {string | null} selectedBook 
+ * @param {boolean} add 
+ * @param {import('../db/db').BibleDatabase} db 
+ * @param {() => void} clearFn 
+ */
+export async function memorySelected(selectedIds, selectedBook, add, db, clearFn) {
+	/** @type {Array<any>} */
+	const updates = [];
+	/** @type {Array<string>} */
+	const deletes = [];
+	
+	if (!selectedBook) {
+		for (const book of selectedIds) {
+			const total = BIBLE_BOOKS[book];
+			for (let i = 1; i <= total; i++) {
+				const citation = `${book}_${i}`;
+				if (add) updates.push({ citation });
+				else deletes.push(citation);
+			}
+		}
+	} else {
+		for (const chap of selectedIds) {
+			const citation = `${selectedBook}_${chap}`;
+			if (add) updates.push({ citation });
+			else deletes.push(citation);
+		}
+	}
+	
+	if (add) await db.memory_queue.bulkPut(updates);
+	else await db.memory_queue.bulkDelete(deletes);
+	clearFn();
+}

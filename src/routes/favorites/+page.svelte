@@ -2,7 +2,7 @@
 	import { db } from '$lib/db/db';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { createSelectionManager, longpress } from '$lib/utils/helpers';
+	import { createSelectionManager, longpress, copySelected, locateSelected } from '$lib/utils/helpers';
 	import SelectionActionBar from '$lib/components/SelectionActionBar.svelte';
 	import { headerTitle, headerAction } from '$lib/stores/header';
 
@@ -28,23 +28,6 @@
 	async function removeFavorite(id) {
 		await db.favorite_verses.delete(id);
 		favoritesWithText = favoritesWithText.filter(f => f.id !== id);
-	}
-
-	async function copySelected() {
-		const sortedVerses = favoritesWithText.filter(v => $selected.has(v.id));
-		const textToCopy = sortedVerses.map(v => `${v.citation} ${v.text}`).join('\n');
-		
-		try { await navigator.clipboard.writeText(textToCopy); } catch (err) {}
-		clear();
-	}
-
-	function locateSelected() {
-		const firstSelectedId = Array.from($selected)[0];
-		const targetVerse = favoritesWithText.find(v => v.id === firstSelectedId);
-		
-		if (targetVerse && targetVerse.book) {
-			goto(`/read/${targetVerse.book}/${targetVerse.chapter}`);
-		}
 	}
 </script>
 
@@ -83,6 +66,6 @@
 {/if}
 
 <SelectionActionBar selectedCount={$selected.size} onClear={clear}>
-	<button on:click={copySelected} class="transition-colors hover:text-[var(--theme-color)]">Copy</button>
-	<button on:click={locateSelected} class="transition-colors hover:text-green-400">Locate</button>
+	<button on:click={() => copySelected($selected, favoritesWithText, clear)} class="transition-colors hover:text-[var(--theme-color)]">Copy</button>
+	<button on:click={() => locateSelected($selected, favoritesWithText, goto)} class="transition-colors hover:text-green-400">Locate</button>
 </SelectionActionBar>
