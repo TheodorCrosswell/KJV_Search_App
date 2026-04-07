@@ -62,7 +62,7 @@
 				{#if $selected.has(book)}
 					<div class="absolute inset-0 bg-[var(--theme-light)] border-[3px] border-[var(--theme-color)] rounded"></div>
 				{/if}
-				<span class="text-[0.65rem] sm:text-xs md:text-base lg:text-lg font-bold leading-none z-10">{BOOK_ABBREVIATIONS[book]}</span>
+				<span class="text-[0.65rem] sm:text-xs md:text-base lg:text-lg font-bold leading-none z-10">{percent === 100 ? '✓ '+ BOOK_ABBREVIATIONS[book]+' ✓':BOOK_ABBREVIATIONS[book]}</span>
 				<span class="mt-0.5 sm:mt-1 w-full truncate text-center text-[0.45rem] sm:text-[0.55rem] md:text-xs leading-tight opacity-90 z-10">{book}</span>
 			</button>
 		{/each}

@@ -21,37 +21,37 @@
 <div class="grid grid-cols-2 gap-4">
 	<!-- Top Left: Continue reading -->
 	<a href={continueLink} class="flex h-32 flex-col items-center justify-center rounded-xl bg-[var(--theme-color)] p-4 text-center shadow-md transition-transform active:scale-95">
-		<span class="mb-1 text-lg font-bold leading-tight text-white">Continue</span>
+		<span class="mb-1 text-lg font-bold leading-tight text-white">Continue 🕮</span>
 		<span class="text-xs font-medium text-white/80">{continueLabel}</span>
 	</a>
 
 	<!-- Top Right: Memory -->
 	<a href="/memory" class="flex h-32 flex-col items-center justify-center rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] p-4 text-center shadow-sm transition-transform hover:bg-[var(--hover-bg)] active:scale-95">
-		<span class="text-lg font-bold text-[var(--text-main)]">Memory</span>
+		<span class="text-lg font-bold text-[var(--text-main)]">Memory ♥</span>
 	</a>
 
 	<!-- Middle Left: Locate -->
 	<a href="/read" class="flex h-32 flex-col items-center justify-center rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] p-4 text-center shadow-sm transition-transform hover:bg-[var(--hover-bg)] active:scale-95">
-		<span class="text-lg font-bold text-[var(--text-main)]">Locate</span>
+		<span class="text-lg font-bold text-[var(--text-main)]">Locate ⌖</span>
 	</a>
 
 	<!-- Middle Right: Search -->
 	<a href="/search" class="flex h-32 flex-col items-center justify-center rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] p-4 text-center shadow-sm transition-transform hover:bg-[var(--hover-bg)] active:scale-95">
-		<span class="text-lg font-bold text-[var(--text-main)]">Search</span>
+		<span class="text-lg font-bold text-[var(--text-main)]">Search ⌕</span>
 	</a>
 
 	<!-- Bottom Left: Settings -->
 	<a href="/settings" class="flex h-32 flex-col items-center justify-center rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] p-4 text-center shadow-sm transition-transform hover:bg-[var(--hover-bg)] active:scale-95">
-		<span class="text-lg font-bold text-[var(--text-main)]">Settings</span>
+		<span class="text-lg font-bold text-[var(--text-main)]">Settings ⚙</span>
 	</a>
 
 	<!-- Bottom Right: Favorite Bible verses -->
 	<a href="/favorites" class="flex h-32 flex-col items-center justify-center rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] p-4 text-center shadow-sm transition-transform hover:bg-[var(--hover-bg)] active:scale-95">
-		<span class="text-lg font-bold leading-tight text-[var(--text-main)]">Favorite<br>Verses</span>
+		<span class="text-lg font-bold leading-tight text-[var(--text-main)]">Favorite ★<br>Verses</span>
 	</a>
 
 	<!-- Full Width Bottom: Soulwinning -->
 	<a href="/soulwinning" class="col-span-2 flex h-16 flex-col items-center justify-center rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] p-4 text-center shadow-sm transition-transform hover:bg-[var(--hover-bg)] active:scale-95">
-		<span class="text-lg font-bold text-[var(--text-main)]">Soulwinning</span>
+		<span class="text-lg font-bold text-[var(--text-main)]">Soulwinning 🕊</span>
 	</a>
 </div>
