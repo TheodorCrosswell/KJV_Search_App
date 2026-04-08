@@ -117,7 +117,8 @@
 		<h2 class="mb-2 text-sm font-semibold uppercase tracking-wider text-[var(--text-muted)]">Recent Searches</h2>
 		<div class="flex flex-wrap gap-2">
 			{#each recentSearches as rq}
-				<button class="rounded-full bg-[var(--hover-bg)] px-4 py-1.5 text-sm text-[var(--text-main)] transition hover:opacity-80" on:click={() => { query = rq; handleSearch(); }}>{rq}</button>
+				<!-- Removed handleSearch() from the on:click so it just fills the input -->
+				<button class="rounded-full bg-[var(--hover-bg)] px-4 py-1.5 text-sm text-[var(--text-main)] transition hover:opacity-80" on:click={() => query = rq }>{rq}</button>
 			{/each}
 		</div>
 	</div>
