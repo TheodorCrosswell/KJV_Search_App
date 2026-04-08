@@ -60,7 +60,7 @@
 				on:click={() => handleClick(book, () => { clear(); selectedBook = book; })}
 			>
 				{#if $selected.has(book)}
-					<div class="absolute inset-0 bg-[var(--theme-light)] border-[3px] border-[var(--theme-color)] rounded"></div>
+					<div class="absolute inset-0 bg-[var(--theme-light)] border-[3px] border-[var(--text-main)] rounded"></div>
 				{/if}
 				<span class="text-[0.65rem] sm:text-xs md:text-base lg:text-lg font-bold leading-none z-10">{percent === 100 ? '✓ '+ BOOK_ABBREVIATIONS[book]+' ✓':BOOK_ABBREVIATIONS[book]}</span>
 				<span class="mt-0.5 sm:mt-1 w-full truncate text-center text-[0.45rem] sm:text-[0.55rem] md:text-xs leading-tight opacity-90 z-10">{book}</span>
@@ -77,7 +77,7 @@
 				use:longpress
 				on:longpress={() => handleLongPress(chapNum)}
 				on:click={() => handleClick(chapNum, () => { goto(`/read/${selectedBook}/${chapNum}`); })}
-				class="relative flex aspect-square min-h-[56px] items-center justify-center rounded-lg text-xl font-bold shadow transition-colors md:text-xl select-none {isRead ? 'bg-green-600 text-white border-green-600' : 'bg-[var(--bg-card)] text-[var(--text-main)] hover:bg-[var(--hover-bg)] border border-[var(--border-color)]'} {$selected.has(chapNum) ? 'ring-4 ring-[var(--theme-color)] ring-inset' : ''}"
+				class="relative flex aspect-square min-h-[56px] items-center justify-center rounded-lg text-xl font-bold shadow transition-colors md:text-xl select-none {isRead ? 'bg-[var(--theme-color)] text-white border-green-600' : 'bg-[var(--bg-card)] text-[var(--text-main)] hover:bg-[var(--hover-bg)] border border-[var(--border-color)]'} {$selected.has(chapNum) ? 'ring-4 ring-[var(--text-main)] ring-inset' : ''}"
 			>
 				{chapNum}
 			</button>
