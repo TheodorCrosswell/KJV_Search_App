@@ -1,8 +1,9 @@
 <script>
 	import { page } from '$app/stores';
 	import { db } from '$lib/db/db';
-	import { BIBLE_BOOKS, TOTAL_CHAPTERS, createSelectionManager, longpress, copySelected, favoriteSelected } from '$lib/utils/helpers';
+	import { BIBLE_BOOKS, TOTAL_CHAPTERS, createSelectionManager, copySelected, favoriteSelected } from '$lib/utils/helpers';
 	import SelectionActionBar from '$lib/components/SelectionActionBar.svelte';
+	import VerseList from '$lib/components/VerseList.svelte';
 
 	$: book = $page.params.book;
 	$: chapter = parseInt($page.params.chapter);
@@ -41,7 +42,6 @@
 	$: if (book && chapter) loadChapter();
 
 	async function toggleComplete() {
-		
 		const progressId = `${book}_${chapter}`;
 		
 		if (!isCompleted) {
@@ -79,22 +79,6 @@
 			isInMemoryQueue = false;
 		}
 	}
-
-	/** @param {any} verse */
-	async function toggleFavorite(verse) {
-		if (favoriteIds.has(verse.id)) {
-			await db.favorite_verses.delete(verse.id);
-			favoriteIds.delete(verse.id);
-		} else {
-			await db.favorite_verses.put({
-				id: verse.id,
-				citation: verse.citation,
-				timestamp: Date.now()
-			});
-			favoriteIds.add(verse.id);
-		}
-		favoriteIds = favoriteIds; 
-	}
 </script>
 
 <div class="mb-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -109,25 +93,13 @@
 	</div>
 </div>
 
-<!-- Added portrait styling to pull edges out, hide side borders and roundness -->
-<div class="space-y-1 rounded border border-[var(--border-color)] bg-[var(--bg-card)] p-4 shadow sm:p-6 portrait:-mx-4 portrait:rounded-none portrait:border-x-0 portrait:px-2">
-	{#if verses.length === 0}
-		<p class="text-[var(--text-main)]">Loading verses...</p>
-	{/if}
-	{#each verses as v}
-		<div
-			role="button"
-			tabindex="0"
-			class="flex cursor-pointer select-none items-start gap-3 rounded p-2 -mx-2 transition-colors group {$selected.has(v.id) ? 'bg-[var(--theme-light)]' : 'hover:bg-[var(--hover-bg)]'}"
-			use:longpress
-			on:longpress={() => handleLongPress(v.id)}
-			on:click={() => handleClick(v.id, () => {})}
-			on:keydown={(/** @type {KeyboardEvent} */ e) => e.key === 'Enter' && handleClick(v.id, () => {})}
-		>
-			<p class="flex-1 text-lg text-[var(--text-main)]"><sup class="mr-1 text-xs font-bold">{v.verse}</sup>{v.text}</p>
-		</div>
-	{/each}
-</div>
+<VerseList 
+	{verses}
+	selected={$selected}
+	{handleLongPress}
+	{handleClick}
+	fallbackMessage="Loading verses..."
+/>
 
 <div class="h-32"></div>
 

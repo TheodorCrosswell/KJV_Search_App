@@ -2,8 +2,9 @@
 	import { db } from '$lib/db/db';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
-	import { createSelectionManager, longpress, copySelected, favoriteSelected, locateSelected } from '$lib/utils/helpers';
+	import { createSelectionManager, copySelected, favoriteSelected, locateSelected } from '$lib/utils/helpers';
 	import SelectionActionBar from '$lib/components/SelectionActionBar.svelte';
+	import VerseList from '$lib/components/VerseList.svelte';
 	import { headerTitle, headerAction } from '$lib/stores/header';
 
 	$: headerTitle.set('Bible Search');
@@ -96,22 +97,6 @@
 		const regex = new RegExp(`\\b(${pattern})[a-zA-Z0-9'\\-]*`, 'gi');
 		return text.replace(regex, '<mark class="bg-yellow-500/40 text-[var(--text-main)] rounded-sm px-1">$&</mark>');
 	}
-
-	/** @param {any} verse */
-	async function toggleFavorite(verse) {
-		if (favoriteIds.has(verse.id)) {
-			await db.favorite_verses.delete(verse.id);
-			favoriteIds.delete(verse.id);
-		} else {
-			await db.favorite_verses.put({
-				id: verse.id,
-				citation: verse.citation,
-				timestamp: Date.now()
-			});
-			favoriteIds.add(verse.id);
-		}
-		favoriteIds = favoriteIds; 
-	}
 </script>
 
 <div class="mb-6 flex flex-col gap-3 sm:flex-row">
@@ -142,24 +127,21 @@
 	<p class="text-[var(--text-main)]">Searching...</p>
 {:else}
 	<p class="mb-4 text-[var(--text-muted)]">{results.length} results found.</p>
-	<div class="space-y-3 pb-24">
-		{#each results as res}
-			<div
-				role="button"
-				tabindex="0"
-				class="group flex cursor-pointer select-none items-start gap-4 rounded border border-[var(--border-color)] p-4 shadow transition-colors {$selected.has(res.id) ? 'bg-[var(--theme-light)]' : 'bg-[var(--bg-card)] hover:bg-[var(--hover-bg)]'}"
-				use:longpress
-				on:longpress={() => handleLongPress(res.id)}
-				on:click={() => handleClick(res.id, () => {})}
-				on:keydown={(/** @type {KeyboardEvent} */ e) => e.key === 'Enter' && handleClick(res.id, () => {})}
-			>
+	<div class="pb-24">
+		<VerseList 
+			verses={results}
+			selected={$selected}
+			{handleLongPress}
+			{handleClick}
+			fallbackMessage=""
+		>
+			<svelte:fragment let:verse={res}>
 				<div class="flex-1 text-left">
 					<h3 class="mb-1 font-bold text-[var(--theme-color)]">{res.citation}</h3>
 					<p class="text-[var(--text-main)]">{@html highlight(res.text)}</p>
 				</div>
-				<button on:click|stopPropagation={() => toggleFavorite(res)} class="mt-1 text-2xl transition-colors {favoriteIds.has(res.id) ? 'text-red-500' : 'text-[var(--border-color)] hover:text-red-400'}" aria-label="Toggle Favorite">♥</button>
-			</div>
-		{/each}
+			</svelte:fragment>
+		</VerseList>
 	</div>
 {/if}
 
