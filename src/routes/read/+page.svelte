@@ -54,7 +54,7 @@
 			{@const percent = getBookProgress(book)}
 			<button 
 				class="relative flex h-full w-full flex-col items-center justify-center rounded p-0.5 md:p-1 shadow-sm transition-colors overflow-hidden select-none {percent > 50 ? 'text-white' : 'text-[var(--text-main)]'}"
-				style="background-color: color-mix(in srgb, #22c55e {percent}%, var(--bg-card));"
+				style="background-color: color-mix(in srgb, var(--theme-color) {percent}%, var(--bg-card));"
 				use:longpress
 				on:longpress={() => handleLongPress(book)}
 				on:click={() => handleClick(book, () => { clear(); selectedBook = book; })}
