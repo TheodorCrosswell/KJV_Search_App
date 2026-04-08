@@ -20,25 +20,23 @@ export const BIBLE_BOOKS = {
   James: 5, "1 Peter": 5, "2 Peter": 3, "1 John": 5, "2 John": 1,
   "3 John": 1, Jude: 1, Revelation: 22
 };
-
 /** @type {Record<string, string>} */
 export const BOOK_ABBREVIATIONS = {
   Genesis: 'Ge', Exodus: 'Ex', Leviticus: 'Le', Numbers: 'Nu', Deuteronomy: 'De',
-  Joshua: 'Jo', Judges: 'Ju', Ruth: 'Ru', '1 Samuel': '1S', '2 Samuel': '2S',
-  '1 Kings': '1K', '2 Kings': '2K', '1 Chronicles': '1C', '2 Chronicles': '2C',
-  Ezra: 'Ez', Nehemiah: 'Ne', Esther: 'Es', Job: 'Jb', Psalms: 'Ps',
+  Joshua: 'Jos', Judges: 'Jdg', Ruth: 'Ru', '1 Samuel': '1S', '2 Samuel': '2S',
+  '1 Kings': '1K', '2 Kings': '2K', '1 Chronicles': '1Ch', '2 Chronicles': '2Ch',
+  Ezra: 'Ezr', Nehemiah: 'Ne', Esther: 'Es', Job: 'Jb', Psalms: 'Ps',
   Proverbs: 'Pr', Ecclesiastes: 'Ec', 'Song of Solomon': 'SoS', Isaiah: 'Is',
-  Jeremiah: 'Je', Lamentations: 'La', Ezekiel: 'Ek', Daniel: 'Da', Hosea: 'Ho',
-  Joel: 'Jl', Amos: 'Am', Obadiah: 'Ob', Jonah: 'Jh', Micah: 'Mi', Nahum: 'Na',
-  Habakkuk: 'Ha', Zephaniah: 'Ze', Haggai: 'Hg', Zechariah: 'Zc', Malachi: 'Ma',
-  Matthew: 'Mt', Mark: 'Mk', Luke: 'Lu', John: 'Jn', Acts: 'Ac', Romans: 'Ro',
-  '1 Corinthians': '1C', '2 Corinthians': '2C', Galatians: 'Ga', Ephesians: 'Ep',
-  Philippians: 'Ph', Colossians: 'Co', '1 Thessalonians': '1T', '2 Thessalonians': '2T',
-  '1 Timothy': '1Ti', '2 Timothy': '2Ti', Titus: 'Ti', Philemon: 'Pm', Hebrews: 'He',
-  James: 'Ja', '1 Peter': '1P', '2 Peter': '2P', '1 John': '1J', '2 John': '2J',
-  '3 John': '3J', Jude: 'Jd', Revelation: 'Re'
+  Jeremiah: 'Je', Lamentations: 'La', Ezekiel: 'Eze', Daniel: 'Da', Hosea: 'Ho',
+  Joel: 'Jl', Amos: 'Am', Obadiah: 'Ob', Jonah: 'Jon', Micah: 'Mi', Nahum: 'Na',
+  Habakkuk: 'Ha', Zephaniah: 'Zep', Haggai: 'Hg', Zechariah: 'Zec', Malachi: 'Mal',
+  Matthew: 'Mt', Mark: 'Mk', Luke: 'Lk', John: 'Jn', Acts: 'Ac', Romans: 'Ro',
+  '1 Corinthians': '1Co', '2 Corinthians': '2Co', Galatians: 'Ga', Ephesians: 'Ep',
+  Philippians: 'Php', Colossians: 'Col', '1 Thessalonians': '1Th', '2 Thessalonians': '2Th',
+  '1 Timothy': '1Ti', '2 Timothy': '2Ti', Titus: 'Tit', Philemon: 'Phm', Hebrews: 'He',
+  James: 'Jas', '1 Peter': '1P', '2 Peter': '2P', '1 John': '1Jn', '2 John': '2Jn',
+  '3 John': '3Jn', Jude: 'Jde', Revelation: 'Re'
 };
-
 export const TOTAL_CHAPTERS = 1189;
 
 /**
