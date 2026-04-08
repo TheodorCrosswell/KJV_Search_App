@@ -170,12 +170,13 @@ export function createSelectionManager() {
 		setTimeout(() => justLongPressed = false, 1000);
 	}
 
-	function handleClick(/** @type {any} */ id, /** @type {() => void | undefined} */ defaultAction) {
-		if (justLongPressed) {
+	function handleClick(/** @type {any} */ id, /** @type {() => void | undefined} */ defaultAction, forceSelect = false) {
+		if (justLongPressed && !forceSelect) {
 			justLongPressed = false;
 			return;
 		}
-		if (get(selectionMode)) {
+		if (get(selectionMode) || forceSelect) {
+			if (forceSelect && !get(selectionMode)) selectionMode.set(true);
 			toggle(id);
 		} else if (defaultAction) {
 			defaultAction();
