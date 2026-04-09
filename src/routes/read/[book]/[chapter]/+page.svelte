@@ -1,5 +1,6 @@
 <script>
 	import { page } from '$app/stores';
+	import { tick } from 'svelte';
 	import { db } from '$lib/db/db';
 	import { BIBLE_BOOKS, TOTAL_CHAPTERS, createSelectionManager, copySelected, favoriteSelected } from '$lib/utils/helpers';
 	import SelectionActionBar from '$lib/components/SelectionActionBar.svelte';
@@ -37,6 +38,25 @@
 
 		const favs = await db.favorite_verses.toArray();
 		favoriteIds = new Set(favs.map(f => f.id));
+
+		// Highlight and scroll to the located verse if coming from search/favorites
+		const targetVerseId = $page.url.searchParams.get('v');
+		if (targetVerseId) {
+			const idNum = parseInt(targetVerseId);
+			// Simulate click to apply the custom selected states natively
+			handleClick(idNum, () => {}, true);
+			
+			// Wait for Svelte to finish rendering the DOM
+			await tick();
+			
+			// Adding a tiny delay guarantees accurate positioning of smooth scroll
+			setTimeout(() => {
+				const el = document.getElementById(`verse-${idNum}`);
+				if (el) {
+					el.scrollIntoView({ behavior: 'auto', block: 'center' });
+				}
+			}, 50);
+		}
 	}
 
 	$: if (book && chapter) loadChapter();

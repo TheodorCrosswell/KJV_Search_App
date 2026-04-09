@@ -2,7 +2,8 @@
 	import { db } from '$lib/db/db';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
-	import { createSelectionManager, copySelected, favoriteSelected, locateSelected } from '$lib/utils/helpers';
+	// Removed `locateSelected` from imports since we are doing it locally to append the query param
+	import { createSelectionManager, copySelected, favoriteSelected } from '$lib/utils/helpers';
 	import SelectionActionBar from '$lib/components/SelectionActionBar.svelte';
 	import VerseList from '$lib/components/VerseList.svelte';
 	import { headerTitle, headerAction } from '$lib/stores/header';
@@ -97,12 +98,23 @@
 		const regex = new RegExp(`\\b(${pattern})[a-zA-Z0-9'\\-]*`, 'gi');
 		return text.replace(regex, '<mark class="bg-yellow-500/40 text-[var(--text-main)] rounded-sm px-1">$&</mark>');
 	}
+
+	function handleLocate() {
+		if ($selected.size === 0) return;
+		const firstId = Array.from($selected)[0];
+		const res = results.find(v => v.id === firstId);
+		if (res) {
+			// Attach the verse id so the reading page knows what to highlight and scroll to
+			goto(`/read/${res.book}/${res.chapter}?v=${res.id}`);
+			clear();
+		}
+	}
 </script>
 
 <div class="mb-6 flex flex-col gap-3 sm:flex-row">
-	<input type="text" bind:value={query} placeholder="Search here." class="flex-1 rounded border border-[var(--border-color)] bg-[var(--bg-card)] text-[var(--text-main)] p-3 shadow-sm ring-[var(--theme-color)] outline-none focus:ring-2" on:keydown={(/** @type {KeyboardEvent} */ e) => e.key === 'Enter' && handleSearch()} />
+	<input type="text" bind:value={query} placeholder="Search here." class="flex-1 rounded border border-[var(--border-color)] bg-[var(--bg-card)] p-3 text-[var(--text-main)] shadow-sm outline-none ring-[var(--theme-color)] focus:ring-2" on:keydown={(/** @type {KeyboardEvent} */ e) => e.key === 'Enter' && handleSearch()} />
 	<div class="flex w-full gap-2 sm:w-auto">
-		<select bind:value={selectedCategory} class="flex-1 rounded border border-[var(--border-color)] bg-[var(--bg-card)] p-3 text-[var(--text-main)] shadow-sm ring-[var(--theme-color)] outline-none focus:ring-2 sm:w-48">
+		<select bind:value={selectedCategory} class="flex-1 rounded border border-[var(--border-color)] bg-[var(--bg-card)] p-3 text-[var(--text-main)] shadow-sm outline-none ring-[var(--theme-color)] focus:ring-2 sm:w-48">
 			<option value="All">All Books</option>
 			{#each Object.keys(BOOK_CATEGORIES) as category}
 				<option value={category}>{category}</option>
@@ -149,5 +161,6 @@
 <SelectionActionBar selectedCount={$selected.size} onClear={clear}>
 	<button on:click={() => copySelected($selected, results, clear)} class="transition-colors hover:text-[var(--theme-color)]">Copy</button>
 	<button on:click={() => favoriteSelected($selected, results, favoriteIds, db, (f) => favoriteIds = f, clear)} class="transition-colors hover:text-red-400">Favorite</button>
-	<button on:click={() => locateSelected($selected, results, goto)} class="transition-colors hover:text-green-400">Locate</button>
+	<!-- Use custom handleLocate -->
+	<button on:click={handleLocate} class="transition-colors hover:text-green-400">Locate</button>
 </SelectionActionBar>

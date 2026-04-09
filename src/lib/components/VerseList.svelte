@@ -21,9 +21,10 @@
 	{/if}
 	{#each verses as v}
 		<div
+			id="verse-{v.id}"
 			role="button"
 			tabindex="0"
-			class="flex cursor-pointer select-none items-start gap-3 rounded p-2 -mx-2 transition-colors group {selected.has(v.id) ? 'bg-[var(--theme-light)]' : 'hover:bg-[var(--hover-bg)]'}"
+			class="group flex cursor-pointer select-none items-start gap-3 rounded -mx-2 p-2 transition-colors {selected.has(v.id) ? 'bg-[var(--theme-light)]' : 'hover:bg-[var(--hover-bg)]'}"
 			on:click={() => handleClick(v.id, () => {}, true)}
 			on:keydown={(/** @type {KeyboardEvent} */ e) => e.key === 'Enter' && handleClick(v.id, () => {}, true)}
 		>
