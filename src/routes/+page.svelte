@@ -21,7 +21,7 @@
 <div class="grid grid-cols-2 gap-4">
 	<!-- Top Left: Continue reading -->
 	<a href={continueLink} class="flex h-32 flex-col items-center justify-center rounded-xl bg-[var(--theme-color)] p-4 text-center shadow-md transition-transform active:scale-95">
-		<span class="mb-1 text-lg font-bold leading-tight text-white">Continue 🕮</span>
+		<span class="mb-1 text-lg font-bold leading-tight text-white">Continue ...</span>
 		<span class="text-xs font-medium text-white/80">{continueLabel}</span>
 	</a>
 
