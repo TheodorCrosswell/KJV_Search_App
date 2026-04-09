@@ -62,21 +62,6 @@ export function getFirstLetters(text) {
 }
 
 /**
- * @param {import('../db/db').BibleDatabase} db
- * @returns {Promise<{globalMin: number, completedInCycle: number, progressMap: any[]}>}
- */
-export async function getCycleStats(db) {
-	const progress = await db.reading_progress.toArray();
-    
-    const countRecord = await db.metadata.get('completion_counts');
-    const globalMin = countRecord ? countRecord.value : 0;
-
-	const completedInCycle = progress.filter((/** @type {any} */ p) => p.is_completed).length;
-
-	return { globalMin, completedInCycle, progressMap: progress };
-}
-
-/**
  * Reusable Action for Long Press mapping
  * @param {any} node
  * @param {number} threshold

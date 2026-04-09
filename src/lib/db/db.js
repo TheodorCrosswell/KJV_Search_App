@@ -12,7 +12,6 @@ export class BibleDatabase extends Dexie {
             reading_progress: 'id, completion_date, is_completed',
             memory_queue: 'citation',
             memory_progress: 'id, citation, current_level, last_practiced_at, [citation+current_level]',
-            metadata: 'key',
             latest_reading: 'id',
             settings: 'key',
             favorite_verses: 'id, citation, timestamp'
@@ -29,9 +28,6 @@ export class BibleDatabase extends Dexie {
         
         /** @type {import('dexie').Table} */
         this.memory_progress = this.table('memory_progress');
-        
-        /** @type {import('dexie').Table} */
-        this.metadata = this.table('metadata');
         
         /** @type {import('dexie').Table} */
         this.latest_reading = this.table('latest_reading');

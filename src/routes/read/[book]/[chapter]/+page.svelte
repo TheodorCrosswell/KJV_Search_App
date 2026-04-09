@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import { tick } from 'svelte';
 	import { db } from '$lib/db/db';
-	import { BIBLE_BOOKS, TOTAL_CHAPTERS, createSelectionManager, copySelected, favoriteSelected } from '$lib/utils/helpers';
+	import { BIBLE_BOOKS, createSelectionManager, copySelected, favoriteSelected } from '$lib/utils/helpers';
 	import SelectionActionBar from '$lib/components/SelectionActionBar.svelte';
 	import VerseList from '$lib/components/VerseList.svelte';
 
@@ -67,22 +67,6 @@
 		if (!isCompleted) {
 			await db.reading_progress.put({ id: progressId, completion_date: Date.now(), is_completed: true });
 			isCompleted = true;
-			
-			const allProgress = await db.reading_progress.toArray();
-			const completedCount = allProgress.filter(/** @type {any} */ p => p.is_completed).length;
-			
-			if (completedCount >= TOTAL_CHAPTERS) {
-				const confirmReset = confirm("Congratulations! You have read the entire Bible! Do you want to increment your completion count and reset your progress?");
-				if (confirmReset) {
-					const countsRecord = await db.metadata.get('completion_counts');
-					const counts = countsRecord ? countsRecord.value : 0;
-					await db.metadata.put({ key: 'completion_counts', value: counts + 1 });
-					
-					const updatedProgress = allProgress.map(/** @type {any} */ p => ({ ...p, is_completed: false }));
-					await db.reading_progress.bulkPut(updatedProgress);
-					isCompleted = false;
-				}
-			}
 		} else {
 			await db.reading_progress.put({ id: progressId, completion_date: Date.now(), is_completed: false });
 			isCompleted = false;
