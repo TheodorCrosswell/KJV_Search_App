@@ -201,13 +201,15 @@ export async function copySelected(selectedIds, verses, clearFn) {
 export async function favoriteSelected(selectedIds, verses, favoriteIds, db, updateFavsFn, clearFn) {
 	const sortedVerses = verses.filter(v => selectedIds.has(v.id));
 	let updatedFavs = new Set(favoriteIds);
+	const now = Date.now();
 	
 	for (let v of sortedVerses) {
 		if (!updatedFavs.has(v.id)) {
 			await db.favorite_verses.put({
 				id: v.id,
 				citation: v.citation,
-				timestamp: Date.now()
+				timestamp: now,
+				updated_at: now
 			});
 			updatedFavs.add(v.id);
 		}
@@ -252,14 +254,14 @@ export async function markSelectedAs(selectedIds, selectedBook, isRead, readChap
 		for (const book of selectedIds) {
 			const total = BIBLE_BOOKS[book];
 			for (let i = 1; i <= total; i++) {
-				updates.push({ id: `${book}_${i}`, completion_date: now, is_completed: isRead });
+				updates.push({ id: `${book}_${i}`, completion_date: now, is_completed: isRead, updated_at: now });
 				if (isRead) updatedReadChapters.add(`${book}_${i}`);
 				else updatedReadChapters.delete(`${book}_${i}`);
 			}
 		}
 	} else {
 		for (const chap of selectedIds) {
-			updates.push({ id: `${selectedBook}_${chap}`, completion_date: now, is_completed: isRead });
+			updates.push({ id: `${selectedBook}_${chap}`, completion_date: now, is_completed: isRead, updated_at: now });
 			if (isRead) updatedReadChapters.add(`${selectedBook}_${chap}`);
 			else updatedReadChapters.delete(`${selectedBook}_${chap}`);
 		}
@@ -279,6 +281,7 @@ export async function markSelectedAs(selectedIds, selectedBook, isRead, readChap
  * @param {() => void} clearFn 
  */
 export async function memorySelected(selectedIds, selectedBook, add, db, clearFn) {
+	const now = Date.now();
 	/** @type {Array<any>} */
 	const updates = [];
 	/** @type {Array<string>} */
@@ -289,14 +292,14 @@ export async function memorySelected(selectedIds, selectedBook, add, db, clearFn
 			const total = BIBLE_BOOKS[book];
 			for (let i = 1; i <= total; i++) {
 				const citation = `${book}_${i}`;
-				if (add) updates.push({ citation });
+				if (add) updates.push({ citation, updated_at: now });
 				else deletes.push(citation);
 			}
 		}
 	} else {
 		for (const chap of selectedIds) {
 			const citation = `${selectedBook}_${chap}`;
-			if (add) updates.push({ citation });
+			if (add) updates.push({ citation, updated_at: now });
 			else deletes.push(citation);
 		}
 	}

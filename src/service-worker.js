@@ -39,6 +39,13 @@ sw.addEventListener('activate', (event) => {
 sw.addEventListener('fetch', (event) => {
     if (event.request.method !== 'GET') return;
 
+    const url = new URL(event.request.url);
+
+    // Bypass Service Worker Cache for Supabase API calls
+    if (url.pathname.startsWith('/rest/v1/') || url.pathname.startsWith('/auth/v1/')) {
+        return;
+    }
+
     event.respondWith(
         caches.match(event.request).then(async (cachedResponse) => {
             // 1. Return cached response if we have it

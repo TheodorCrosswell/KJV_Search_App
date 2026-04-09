@@ -17,6 +17,27 @@ export class BibleDatabase extends Dexie {
             favorite_verses: 'id, citation, timestamp'
         });
 
+        // V2 Schema - Add updated_at for Cloud Sync
+        this.version(2).stores({
+            kjv_text: 'id, citation, book, [book+chapter]', // Static, unaffected
+            reading_progress: 'id, completion_date, is_completed, updated_at',
+            memory_queue: 'citation, updated_at',
+            memory_progress: 'id, citation, current_level, last_practiced_at, updated_at, [citation+current_level]',
+            latest_reading: 'id, updated_at',
+            settings: 'key, updated_at',
+            favorite_verses: 'id, citation, timestamp, updated_at'
+        }).upgrade(tx => {
+            const now = Date.now();
+            return Promise.all([
+                tx.table('reading_progress').toCollection().modify(item => { item.updated_at = now; }),
+                tx.table('memory_queue').toCollection().modify(item => { item.updated_at = now; }),
+                tx.table('memory_progress').toCollection().modify(item => { item.updated_at = now; }),
+                tx.table('latest_reading').toCollection().modify(item => { item.updated_at = now; }),
+                tx.table('settings').toCollection().modify(item => { item.updated_at = now; }),
+                tx.table('favorite_verses').toCollection().modify(item => { item.updated_at = now; })
+            ]);
+        });
+
         /** @type {import('dexie').Table} */
         this.kjv_text = this.table('kjv_text');
         
